@@ -10,24 +10,25 @@ export default function AnnouncementsPage() {
 
   return (
     <main className="mx-auto max-w-3xl px-6 py-16">
-      <h1 className="font-serif text-3xl font-bold text-ink">Announcements</h1>
-      <p className="mt-2 text-sm text-ink-muted">
+      <h1 className="font-serif text-4xl font-bold text-ink">Announcements</h1>
+      <p className="mt-2 text-lg text-ink-muted">
         Course-wide updates from Asad Zaman — emails, notices, and deadline
         changes.
       </p>
 
       {announcements.length === 0 ? (
-        <p className="mt-8 text-sm text-ink-muted">No announcements yet.</p>
+        <p className="mt-8 text-ink-muted">No announcements yet.</p>
       ) : (
         <div className="mt-8">
           {announcements.map((announcement) => (
             <ReferenceCard
               key={announcement.slug}
               date={announcement.frontmatter.date}
+              size="comfortable"
               entry={{
                 title: announcement.frontmatter.title,
                 relevance: (
-                  <div className="prose prose-sm max-w-none text-ink prose-p:my-2 prose-ul:my-2 prose-strong:text-ink">
+                  <div className="prose prose-lg max-w-none text-ink prose-headings:font-serif prose-h3:text-xl prose-p:my-3 prose-ul:my-3 prose-strong:text-ink">
                     <MDXRemote source={announcement.content} />
                   </div>
                 ),
