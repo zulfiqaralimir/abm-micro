@@ -2,4 +2,23 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Phase 2 (design system) fills this in: fonts, color tokens, base typography */
+@layer base {
+  body {
+    @apply bg-paper text-ink antialiased;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply font-serif text-ink;
+  }
+
+  ::selection {
+    @apply bg-accent/20;
+  }
+
+  a {
+    @apply text-accent underline-offset-4 hover:text-accent-hover;
+  }
+}

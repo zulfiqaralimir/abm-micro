@@ -1,4 +1,10 @@
+import { Inter, Source_Serif_4 } from "next/font/google";
+import SiteNav from "@/components/SiteNav";
+import PageTransition from "@/components/PageTransition";
 import "./globals.css";
+
+const sans = Inter({ subsets: ["latin"], variable: "--font-sans" });
+const serif = Source_Serif_4({ subsets: ["latin"], variable: "--font-serif" });
 
 export const metadata = {
   title: "ABM Micro",
@@ -8,9 +14,10 @@ export const metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
-      <body className="min-h-screen bg-white font-sans text-gray-900">
-        {children}
+    <html lang="en" className={`${sans.variable} ${serif.variable}`}>
+      <body className="min-h-screen bg-paper font-sans text-ink">
+        <SiteNav />
+        <PageTransition>{children}</PageTransition>
       </body>
     </html>
   );
