@@ -26,7 +26,11 @@ export default function AnnouncementsPage() {
               date={announcement.frontmatter.date}
               entry={{
                 title: announcement.frontmatter.title,
-                relevance: <MDXRemote source={announcement.content} />,
+                relevance: (
+                  <div className="prose prose-sm max-w-none text-ink prose-p:my-2 prose-ul:my-2 prose-strong:text-ink">
+                    <MDXRemote source={announcement.content} />
+                  </div>
+                ),
               }}
             />
           ))}
