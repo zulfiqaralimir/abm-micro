@@ -1,0 +1,25 @@
+# Reference Section data (CLAUDE.md §5).
+# Populate as citations are supplied — do NOT fabricate entries. Each item renders via <ReferenceCard>.
+#
+# type: paper | book | article | resource
+# tags: free-form, used for filtering on /applications/reference
+
+papers: []
+  # - type: paper
+  #   title: "TODO"
+  #   citation: "TODO — full citation"
+  #   url: "TODO — DOI/arXiv/SSRN link"
+  #   relevance: "TODO — one line on why it matters here"
+  #   tags: [agent-based-modeling]
+
+books: []
+
+articles: []
+
+resources: []
+  # - type: resource
+  #   title: "TODO — e.g. NetLogo"
+  #   citation: "TODO"
+  #   url: "TODO"
+  #   relevance: "TODO"
+  #   tags: [software]
