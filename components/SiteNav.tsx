@@ -10,6 +10,7 @@ const links = [
   { href: "/course", label: "Course" },
   { href: "/applications", label: "Applications" },
   { href: "/sandbox", label: "Sandbox" },
+  { href: "/announcements", label: "Announcements" },
 ];
 
 export default function SiteNav() {
