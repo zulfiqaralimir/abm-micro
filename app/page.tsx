@@ -16,8 +16,16 @@ export default function HomePage() {
           This course starts with agent-based models small enough — few
           enough agents, simple enough rules — that the whole thing can be
           worked through on paper. From there, it rebuilds the standard
-          textbook results one at a time: the demand curve, market
-          equilibrium, the welfare theorems, rent control, the minimum wage.
+          textbook results one at a time:
+        </p>
+        <ul className="mt-4 space-y-1 text-lg text-ink-muted">
+          <li>The demand curve</li>
+          <li>Market equilibrium</li>
+          <li>The welfare theorems</li>
+          <li>Rent control</li>
+          <li>The minimum wage</li>
+        </ul>
+        <p className="mt-4 text-lg leading-relaxed text-ink-muted">
           Building each result from the ground up shows exactly what has to
           be true about people before the result appears at all — and what
           happens when those assumptions don&apos;t hold.
