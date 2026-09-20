@@ -31,7 +31,7 @@ export default function HomePage() {
         </h1>
         <p className="mt-3 max-w-[42rem] font-serif text-xl italic text-ink-muted">
           Rebuilding microeconomics,{" "}
-          <mark className="rounded bg-accent/15 px-1 text-accent-hover">
+          <mark className="rounded bg-yellow-200 px-1 text-ink">
             one small model at a time
           </mark>
           .
@@ -40,12 +40,12 @@ export default function HomePage() {
         <div className="max-w-[42rem]">
           <p className="mt-6 text-lg leading-relaxed text-ink-muted">
             This course starts with agent-based models small enough —{" "}
-            <mark className="rounded bg-accent/15 px-1 text-accent-hover">
+            <mark className="rounded bg-yellow-200 px-1 text-ink">
               few enough agents, simple enough rules
             </mark>{" "}
             — that the whole thing can be worked through on paper. From
             there, it{" "}
-            <mark className="rounded bg-accent/15 px-1 text-accent-hover">
+            <mark className="rounded bg-yellow-200 px-1 text-ink">
               rebuilds the standard textbook results one at a time
             </mark>
             :
@@ -57,7 +57,7 @@ export default function HomePage() {
           </ul>
           <p className="mt-4 text-lg leading-relaxed text-ink-muted">
             Building each result from the ground up shows exactly{" "}
-            <mark className="rounded bg-accent/15 px-1 text-accent-hover">
+            <mark className="rounded bg-yellow-200 px-1 text-ink">
               what has to be true about people before the result appears at
               all — and what happens when those assumptions don&apos;t hold
             </mark>
