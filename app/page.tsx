@@ -10,11 +10,16 @@ const RESULTS = [
   "The minimum wage",
 ];
 
-const PREREQUISITES = [
+const PREREQUISITES: React.ReactNode[] = [
   "No programming required or taught",
   "No calculus, statistics, or econometrics assumed",
   "Models run with arithmetic, and later a spreadsheet",
-  "Open to students who could never take a computational modelling course — sociology, political science, Islamic studies, and anyone else working on how people behave in groups",
+  <>
+    Open to students who could never take a{" "}
+    <mark className="rounded bg-yellow-200 px-1 text-ink">computational modelling</mark>{" "}
+    course — sociology, political science, Islamic studies, and anyone else
+    working on how people behave in groups
+  </>,
 ];
 
 // Landing page copy paraphrased from Asad Zaman's Sep 19, 2026 announcement
@@ -84,8 +89,8 @@ export default function HomePage() {
       <section className="mt-20 border-t border-border pt-10">
         <h2 className="font-serif text-2xl font-semibold text-ink">No Prerequisites</h2>
         <ul className="mt-6 grid gap-x-8 gap-y-4 sm:grid-cols-2">
-          {PREREQUISITES.map((item) => (
-            <li key={item} className="flex gap-3 text-ink-muted">
+          {PREREQUISITES.map((item, i) => (
+            <li key={i} className="flex gap-3 text-ink-muted">
               <svg
                 viewBox="0 0 20 20"
                 fill="none"
