@@ -30,15 +30,22 @@ export default function HomePage() {
           ABM Micro
         </h1>
         <p className="mt-3 max-w-[42rem] font-serif text-xl italic text-ink-muted">
-          Rebuilding microeconomics, one small model at a time.
+          Rebuilding microeconomics,{" "}
+          <span className="text-accent">one small model at a time</span>.
         </p>
 
         <div className="max-w-[42rem]">
           <p className="mt-6 text-lg leading-relaxed text-ink-muted">
-            This course starts with agent-based models small enough — few
-            enough agents, simple enough rules — that the whole thing can be
-            worked through on paper. From there, it rebuilds the standard
-            textbook results one at a time:
+            This course starts with agent-based models small enough —{" "}
+            <span className="text-accent">
+              few enough agents, simple enough rules
+            </span>{" "}
+            — that the whole thing can be worked through on paper. From
+            there, it{" "}
+            <span className="text-accent">
+              rebuilds the standard textbook results one at a time
+            </span>
+            :
           </p>
           <ul className="mt-4 list-disc space-y-1.5 pl-5 text-lg text-ink-muted marker:text-accent">
             {RESULTS.map((result) => (
@@ -46,9 +53,12 @@ export default function HomePage() {
             ))}
           </ul>
           <p className="mt-4 text-lg leading-relaxed text-ink-muted">
-            Building each result from the ground up shows exactly what has to
-            be true about people before the result appears at all — and what
-            happens when those assumptions don&apos;t hold.
+            Building each result from the ground up shows exactly{" "}
+            <span className="text-accent">
+              what has to be true about people before the result appears at
+              all — and what happens when those assumptions don&apos;t hold
+            </span>
+            .
           </p>
         </div>
 
