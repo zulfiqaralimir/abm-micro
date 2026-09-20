@@ -24,6 +24,12 @@ export default function HomePage() {
           Applications
         </Link>
       </div>
+      <Link
+        href="/announcements"
+        className="mt-6 inline-block text-sm text-ink-muted no-underline hover:text-accent"
+      >
+        Latest updates →
+      </Link>
       {/* TODO: Asad Zaman's framing + link to source course once supplied */}
     </main>
   );
