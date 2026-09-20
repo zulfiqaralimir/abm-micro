@@ -22,3 +22,19 @@
     @apply text-accent underline-offset-4 hover:text-accent-hover;
   }
 }
+
+@layer components {
+  /* Auto-numbering for <WalkthroughStep> — scope resets per chapter article. */
+  .chapter-walkthrough {
+    counter-reset: walkthrough-step;
+  }
+
+  .walkthrough-step {
+    counter-increment: walkthrough-step;
+  }
+
+  .walkthrough-step::before {
+    content: "Step " counter(walkthrough-step);
+    @apply mb-1 block text-xs font-semibold uppercase tracking-wide text-ink-faint;
+  }
+}
