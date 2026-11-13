@@ -1,5 +1,6 @@
 import { Inter, Source_Serif_4, Playfair_Display } from "next/font/google";
 import SiteNav from "@/components/SiteNav";
+import SiteFooter from "@/components/SiteFooter";
 import PageTransition from "@/components/PageTransition";
 import "./globals.css";
 
@@ -19,6 +20,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="min-h-screen bg-paper font-sans text-ink">
         <SiteNav />
         <PageTransition>{children}</PageTransition>
+        <SiteFooter />
       </body>
     </html>
   );
