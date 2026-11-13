@@ -22,10 +22,11 @@ export default function HomePage() {
   return (
     <main className="overflow-x-clip">
       {/* HERO */}
-      <section className="hero-mesh relative">
+      <section className="hero-mesh relative overflow-hidden">
         <div className="grid-dots pointer-events-none absolute inset-0" />
-        <div className="relative mx-auto grid max-w-6xl items-center gap-8 px-6 pb-20 pt-16 lg:grid-cols-2 lg:pt-24">
-          <div>
+        <HeroVisual />
+        <div className="mx-auto grid max-w-6xl items-center gap-8 px-6 pb-20 pt-16 lg:grid-cols-2 lg:pt-24">
+          <div className="relative z-10">
             <Reveal>
               <span className="inline-flex items-center gap-2 rounded-full border border-accent/20 bg-paper-raised/80 px-3.5 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-accent shadow-sm backdrop-blur">
                 <span className="relative flex h-2 w-2">
@@ -70,9 +71,6 @@ export default function HomePage() {
               </div>
             </Reveal>
           </div>
-          <Reveal delay={0.25} className="float-slow mx-auto aspect-[520/440] w-full max-w-xl">
-            <HeroVisual />
-          </Reveal>
         </div>
       </section>
 

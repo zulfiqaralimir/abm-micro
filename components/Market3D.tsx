@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useRef } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 
 // 3D market: teal spheres (buyers) and amber cubes (sellers) float around a
@@ -15,6 +15,7 @@ function seeded(i: number, k: number) {
 
 function Agents() {
   const group = useRef<THREE.Group>(null);
+  const vw = useThree((st) => st.viewport.width);
   const ring = useRef<THREE.Mesh>(null);
   const buyers = useRef<(THREE.Mesh | null)[]>([]);
   const sellers = useRef<(THREE.Mesh | null)[]>([]);
@@ -70,7 +71,7 @@ function Agents() {
   });
 
   return (
-    <group ref={group}>
+    <group ref={group} position={[vw * 0.2, -0.2, 0]} scale={1.15}>
       {Array.from({ length: N }, (_, i) => (
         <mesh key={`b${i}`} ref={(el) => void (buyers.current[i] = el)}>
           <sphereGeometry args={[0.26, 32, 32]} />
@@ -105,6 +106,8 @@ function Agents() {
 export default function Market3D() {
   return (
     <Canvas
+      eventSource={document.body}
+      eventPrefix="client"
       camera={{ position: [0, 0, 7.5], fov: 45 }}
       dpr={[1, 1.75]}
       gl={{ antialias: true, alpha: true }}
