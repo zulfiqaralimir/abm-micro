@@ -38,3 +38,36 @@
     @apply mb-1 block text-xs font-semibold uppercase tracking-wide text-ink-faint;
   }
 }
+
+@layer utilities {
+  .hero-mesh {
+    background:
+      radial-gradient(60% 50% at 15% 20%, rgba(43, 90, 107, 0.18), transparent 70%),
+      radial-gradient(50% 45% at 85% 25%, rgba(184, 121, 31, 0.16), transparent 70%),
+      radial-gradient(60% 50% at 50% 100%, rgba(75, 142, 163, 0.14), transparent 70%);
+  }
+  .grid-dots {
+    background-image: radial-gradient(rgba(43, 90, 107, 0.18) 1px, transparent 1px);
+    background-size: 22px 22px;
+    mask-image: radial-gradient(ellipse at center, black 30%, transparent 75%);
+  }
+  .shimmer-text {
+    background-size: 200% auto;
+    animation: shimmer 8s linear infinite;
+  }
+  .float-slow {
+    animation: floaty 9s ease-in-out infinite;
+  }
+}
+
+@keyframes shimmer {
+  to { background-position: 200% center; }
+}
+@keyframes floaty {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-14px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shimmer-text, .float-slow { animation: none; }
+}
