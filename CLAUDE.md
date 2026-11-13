@@ -2,6 +2,17 @@
 
 This file is the working specification for Claude Code. Read it fully before generating code. Follow the phased build order at the bottom — do not skip ahead to later phases.
 
+## How to start (read this when returning after a few days)
+
+- **Open:** `D:bm-micro` — in a terminal run `cd D:bm-micro` then `claude`.
+- **Run locally:** `npm install` (once; already done), then `npm run dev` → http://localhost:3000. `npm run build` to check a production build.
+- **Live site:** https://abm-micro.vercel.app/ (auto-deploys from GitHub `zulfiqaralimir/abm-micro`, branch `main`).
+- **Announcements page:** https://abm-micro.vercel.app/announcements (content in `content/announcements`).
+- **Course source material:** https://sites.google.com/view/islamic-economics-2023/abm-micro (Asad Zaman's course site — only source for chapter content).
+- **Inputs/outputs:** chapters and announcements are MDX in `content/course` and `content/announcements`; references in `data/references.yaml`; helpers in `lib/`; components in `components/`; pages in `app/`. No backend, no env vars needed.
+- **History:** project was originally developed on an external drive that crashed; restored on D: by cloning from GitHub on 2026-11-13. Push to GitHub to keep it safe.
+- **Pending:** build phases 4–7 in §9 (remaining chapters as source is supplied, Applications, Reference, Sandbox). Check `git log` and `content/course` to see which phase is current.
+
 ## 1. Project Summary
 
 **ABM Micro** is a web book presenting Asad Zaman's agent-based modeling (ABM) microeconomics course (Ibn Haldun University, Istanbul, Sep–Dec). The course rebuilds standard microeconomic results — demand curve, market equilibrium, welfare theorems, rent control, minimum wage — from small, hand-computable agent-based models, with no calculus/stats/programming prerequisites.

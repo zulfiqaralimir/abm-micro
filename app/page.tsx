@@ -1,6 +1,5 @@
 import Link from "next/link";
-
-const SOURCE_URL = "https://sites.google.com/view/islamic-economics-2023/abm-micro";
+import LinkCards from "@/components/LinkCards";
 
 const RESULTS = [
   "The demand curve",
@@ -31,10 +30,10 @@ export default function HomePage() {
         <p className="text-xs font-semibold uppercase tracking-[0.2em] text-ink-faint">
           A Web Book
         </p>
-        <h1 className="mt-2 font-serif text-4xl font-bold text-ink sm:text-5xl">
+        <h1 className="mt-2 bg-gradient-to-r from-accent via-ink to-assumption bg-clip-text font-display text-5xl font-extrabold tracking-tight text-transparent sm:text-7xl">
           ABM Micro
         </h1>
-        <p className="mt-3 max-w-[42rem] font-serif text-xl italic text-ink-muted">
+        <p className="mt-4 max-w-[42rem] font-display text-2xl italic leading-snug text-ink-muted">
           Rebuilding microeconomics,{" "}
           <mark className="rounded bg-yellow-200 px-1 text-ink">
             one small model at a time
@@ -87,7 +86,7 @@ export default function HomePage() {
       </section>
 
       <section className="mt-20 border-t border-border pt-10">
-        <h2 className="font-serif text-2xl font-semibold text-ink">No Prerequisites</h2>
+        <h2 className="font-display text-3xl font-bold tracking-tight text-ink">No Prerequisites</h2>
         <ul className="mt-6 grid gap-x-8 gap-y-4 sm:grid-cols-2">
           {PREREQUISITES.map((item, i) => (
             <li key={i} className="flex gap-3 text-ink-muted">
@@ -112,7 +111,7 @@ export default function HomePage() {
       </section>
 
       <section className="mt-20 border-t border-border pt-10">
-        <h2 className="font-serif text-2xl font-semibold text-ink">How This Book Is Built</h2>
+        <h2 className="font-display text-3xl font-bold tracking-tight text-ink">How This Book Is Built</h2>
         <p className="mt-4 max-w-[42rem] leading-relaxed text-ink-muted">
           Course material is posted weekly, in the form the class received
           it, along with a short note on what was expected, what actually
@@ -125,20 +124,7 @@ export default function HomePage() {
             so it shows what fails alongside what works.
           </p>
         </div>
-        <p className="mt-5 text-sm">
-          <Link href="/announcements" className="no-underline hover:text-accent-hover">
-            Latest updates →
-          </Link>
-          {" · "}
-          <a
-            href={SOURCE_URL}
-            target="_blank"
-            rel="noreferrer"
-            className="no-underline hover:text-accent-hover"
-          >
-            Course source
-          </a>
-        </p>
+        <LinkCards />
       </section>
 
       <section className="mt-20 border-t border-border pt-6">
