@@ -9,6 +9,14 @@ const display = Playfair_Display({ subsets: ["latin"], variable: "--font-display
 const serif = Source_Serif_4({ subsets: ["latin"], variable: "--font-serif" });
 
 export const metadata = {
+  metadataBase: new URL("https://abm-micro.vercel.app"),
+  openGraph: {
+    title: "ABM Micro",
+    description: "Rebuilding microeconomics, one small model at a time.",
+    siteName: "ABM Micro",
+    type: "website",
+  },
+  twitter: { card: "summary_large_image" as const },
   title: "ABM Micro",
   description:
     "Rebuilding microeconomics from small agent-based models — a web book based on Asad Zaman's ABM Micro course.",
