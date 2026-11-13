@@ -11,6 +11,7 @@ This file is the working specification for Claude Code. Read it fully before gen
 - **Course source material:** https://sites.google.com/view/islamic-economics-2023/abm-micro (Asad Zaman's course site — only source for chapter content).
 - **Inputs/outputs:** chapters and announcements are MDX in `content/course` and `content/announcements`; references in `data/references.yaml`; helpers in `lib/`; components in `components/`; pages in `app/`. No backend, no env vars needed.
 - **History:** project was originally developed on an external drive that crashed; restored on D: by cloning from GitHub on 2026-11-13. Push to GitHub to keep it safe.
+- **Lesson styling:** chapter MDX can use `<Lead>`, `<Callout kind="idea|story|warning|exercise|next">`, `<Pull>`, `<CardGrid>`/`<Card icon="…">`, `<Reference>` and the diagram components (see `lib/mdx-components.ts`, `components/lesson/`). Plain markdown headings, bullets, tables and **bold** are auto-styled. L1 text is a conversational rewrite of the Google Doc source (technical terms unchanged).
 - **Pending:** build phases 4–7 in §9 (remaining chapters as source is supplied, Applications, Reference, Sandbox). Check `git log` and `content/course` to see which phase is current.
 
 ## 1. Project Summary
