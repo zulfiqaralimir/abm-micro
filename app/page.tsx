@@ -1,6 +1,6 @@
 import Link from "next/link";
 import LinkCards from "@/components/LinkCards";
-import AgentHero from "@/components/AgentHero";
+import HeroVisual from "@/components/HeroVisual";
 import ResultCards from "@/components/ResultCards";
 import Reveal from "@/components/Reveal";
 
@@ -71,7 +71,7 @@ export default function HomePage() {
             </Reveal>
           </div>
           <Reveal delay={0.25} className="float-slow mx-auto aspect-[520/440] w-full max-w-xl">
-            <AgentHero />
+            <HeroVisual />
           </Reveal>
         </div>
       </section>
