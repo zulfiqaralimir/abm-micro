@@ -5,6 +5,8 @@ import ChapterLayout from "@/components/ChapterLayout";
 import { getChapter } from "@/lib/chapters";
 import { chapterMdxComponents } from "@/lib/mdx-components";
 import { extractToc, readingMinutes } from "@/lib/slug";
+import { buildNarration } from "@/lib/narration";
+import AudioPlayer from "@/components/lesson/AudioPlayer";
 
 // Generic chapter route — loads content/course/[chapter].mdx as it's added
 // through Phase 4. /course/foundations has its own static route and takes
@@ -22,6 +24,7 @@ export default function ChapterPage({ params }: { params: { chapter: string } })
       <MDXRemote source={chapter.content} components={chapterMdxComponents}
         options={{ mdxOptions: { remarkPlugins: [remarkGfm] } }}
       />
+      <AudioPlayer sections={buildNarration(chapter.content)} />
     </ChapterLayout>
   );
 }
