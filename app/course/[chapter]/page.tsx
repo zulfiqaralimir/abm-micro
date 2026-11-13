@@ -1,4 +1,5 @@
 import { MDXRemote } from "next-mdx-remote/rsc";
+import remarkGfm from "remark-gfm";
 import { notFound } from "next/navigation";
 import ChapterLayout from "@/components/ChapterLayout";
 import { getChapter } from "@/lib/chapters";
@@ -13,7 +14,9 @@ export default function ChapterPage({ params }: { params: { chapter: string } })
 
   return (
     <ChapterLayout frontmatter={chapter.frontmatter}>
-      <MDXRemote source={chapter.content} components={chapterMdxComponents} />
+      <MDXRemote source={chapter.content} components={chapterMdxComponents}
+        options={{ mdxOptions: { remarkPlugins: [remarkGfm] } }}
+      />
     </ChapterLayout>
   );
 }
