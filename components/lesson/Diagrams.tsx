@@ -261,10 +261,13 @@ export function CrossingDiagram() {
   const T = 8;
   const carTimes = [0, 0.5, 1];
   const brake = { duration: T, times: carTimes, repeat: Infinity, ease: ["easeOut", "linear"] as ["easeOut", "linear"] };
-  const towers = [
-    [10, 52, 34], [48, 30, 40], [92, 62, 30], [128, 40, 44], [176, 70, 28], [210, 36, 38],
-    [560, 58, 36], [600, 34, 40], [520, 74, 26],
+  // far haze layer, then near buildings: [x, width, height, roof]
+  const far = [[0, 50, 40], [44, 38, 56], [120, 44, 44], [210, 40, 52], [300, 56, 38], [380, 40, 54], [450, 50, 42], [540, 44, 56], [596, 50, 44]];
+  const near: [number, number, number, string][] = [
+    [4, 40, 54, "flat"], [46, 34, 38, "tank"], [262 + 18, 38, 46, "flat"], [320, 44, 60, "antenna"],
+    [368, 36, 40, "slope"], [410, 26, 34, "flat"], [520, 44, 56, "tank"], [566, 30, 42, "slope"], [600, 36, 62, "antenna"],
   ];
+  const win = (i: number, r: number, c: number) => (i * 7 + r * 13 + c * 5) % 4 !== 0;
   return (
     <Figure vb="0 0 640 280" caption="You can see the car slowing. The driver's intention to stop is what you actually act on, and it is invisible.">
       <defs>
@@ -302,16 +305,65 @@ export function CrossingDiagram() {
       <rect x="0" y="0" width="640" height="118" rx="18" fill="url(#cx-sky)" />
       <motion.circle cx="330" cy="100" r="90" fill="url(#cx-sun)"
         animate={{ opacity: [0.7, 1, 0.7] }} transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }} />
-      {towers.map(([x, h, w], i) => (
-        <g key={i}>
-          <rect x={x} y={118 - h} width={w} height={h} fill="#1f4350" opacity="0.85" />
-          {[0, 1, 2].map((r) => (
-            <motion.rect key={r} x={x + 6 + (r % 2) * 14} y={118 - h + 8 + r * 12} width="6" height="5" rx="1" fill="#ffe29a"
-              animate={{ opacity: [0.2, 0.95, 0.2] }}
-              transition={{ duration: 3 + ((i + r) % 3), delay: (i * 0.7 + r * 0.4) % 3, repeat: Infinity }} />
-          ))}
-        </g>
+      {/* far haze layer */}
+      {far.map(([x, w, h], i) => (
+        <rect key={i} x={x} y={118 - h} width={w} height={h} fill="#6f9aa8" opacity="0.4" />
       ))}
+
+      {/* mosque: dome and twin minarets, the skyline of the city this course is taught in */}
+      <g fill="#183843">
+        <path d="M118 118 V96 H206 V118 Z" />
+        <path d="M130 96 A32 30 0 0 1 194 96 Z" />
+        <path d="M110 96 A14 12 0 0 1 138 96 Z" opacity="0.9" />
+        <path d="M186 96 A14 12 0 0 1 214 96 Z" opacity="0.9" />
+        <rect x="161" y="58" width="2" height="8" />
+        <circle cx="162" cy="56" r="2.5" />
+        {[100, 224].map((mx) => (
+          <g key={mx}>
+            <rect x={mx - 3} y="46" width="6" height="72" />
+            <rect x={mx - 6} y="62" width="12" height="3" />
+            <polygon points={`${mx - 4},46 ${mx},26 ${mx + 4},46`} />
+            <circle cx={mx} cy="24" r="2" />
+          </g>
+        ))}
+      </g>
+      {[148, 162, 176].map((wx) => (
+        <path key={wx} d={`M${wx - 4} 118 V108 A4 5 0 0 1 ${wx + 4} 108 V118 Z`} fill="#ffe29a" opacity="0.75" />
+      ))}
+
+      {/* near buildings with window grids and rooftop details */}
+      {near.map(([x, w, h, roof], i) => {
+        const top = 118 - h;
+        const cols = Math.floor((w - 8) / 10);
+        const rows = Math.floor((h - 10) / 12);
+        return (
+          <g key={i}>
+            <rect x={x} y={top} width={w} height={h} fill="#1f4350" />
+            <rect x={x} y={top} width="3" height={h} fill="#2b5a6b" opacity="0.7" />
+            {roof === "tank" && (
+              <g fill="#1f4350"><rect x={x + 8} y={top - 9} width="14" height="9" rx="2" /><rect x={x + 12} y={top - 12} width="6" height="3" /></g>
+            )}
+            {roof === "antenna" && (
+              <g stroke="#1f4350" strokeWidth="2"><line x1={x + w / 2} y1={top} x2={x + w / 2} y2={top - 16} /><line x1={x + w / 2 - 5} y1={top - 10} x2={x + w / 2 + 5} y2={top - 10} /></g>
+            )}
+            {roof === "slope" && <polygon points={`${x - 2},${top} ${x + w / 2},${top - 10} ${x + w + 2},${top}`} fill="#183843" />}
+            {Array.from({ length: rows }).flatMap((_, r) =>
+              Array.from({ length: cols }).map((__, c) => {
+                const wx = x + 7 + c * 10;
+                const wy = top + 7 + r * 12;
+                if (!win(i, r, c)) return <rect key={`${r}-${c}`} x={wx} y={wy} width="5" height="7" rx="1" fill="#2b5a6b" opacity="0.6" />;
+                if ((i + r + c) % 5 === 0)
+                  return (
+                    <motion.rect key={`${r}-${c}`} x={wx} y={wy} width="5" height="7" rx="1" fill="#ffe29a"
+                      animate={{ opacity: [0.3, 1, 0.3] }}
+                      transition={{ duration: 3 + ((i + r) % 3), delay: (i * 0.7 + c * 0.4) % 3, repeat: Infinity }} />
+                  );
+                return <rect key={`${r}-${c}`} x={wx} y={wy} width="5" height="7" rx="1" fill="#ffe29a" opacity="0.85" />;
+              })
+            )}
+          </g>
+        );
+      })}
 
       {/* drifting clouds */}
       {[[60, 52, 0], [380, 40, 1]].map(([y0, w, k]) => (
@@ -363,10 +415,43 @@ export function CrossingDiagram() {
         transition={{ duration: T, times: [0, 0.55, 0.7, 0.95, 1], repeat: Infinity, ease: "easeInOut" }}
       >
         <ellipse cx="475" cy="130" rx="14" ry="3" fill="#000" opacity="0.25" />
-        <circle cx="475" cy="84" r="9" fill={INK} />
-        <path d="M475 93 L475 114" stroke={INK} strokeWidth="6" strokeLinecap="round" />
-        <path d="M475 114 L469 130 M475 114 L481 130" stroke={INK} strokeWidth="4.5" strokeLinecap="round" />
-        <path d="M475 98 L466 108 M475 98 L484 108" stroke={INK} strokeWidth="3.5" strokeLinecap="round" />
+        {/* standing pose: legs and arms at rest */}
+        <motion.g animate={{ opacity: [1, 1, 0, 0, 1] }} transition={{ duration: T, times: [0, 0.55, 0.56, 0.95, 1], repeat: Infinity }}>
+          <path d="M471 113 V128 M479 113 V128" stroke="#2a2f3a" strokeWidth="5.5" strokeLinecap="round" />
+          <ellipse cx="469.5" cy="130" rx="5" ry="2.6" fill="#15110e" />
+          <ellipse cx="480.5" cy="130" rx="5" ry="2.6" fill="#15110e" />
+          <path d="M466 97 L464 111 M484 97 L486 111" stroke="#b4443a" strokeWidth="4.5" strokeLinecap="round" />
+          <circle cx="464" cy="113" r="2.4" fill="#d9a679" />
+          <circle cx="486" cy="113" r="2.4" fill="#d9a679" />
+        </motion.g>
+        {/* walking pose: legs and arms swing while he steps off */}
+        <motion.g animate={{ opacity: [0, 0, 1, 1, 0] }} transition={{ duration: T, times: [0, 0.55, 0.56, 0.95, 1], repeat: Infinity }}>
+          {[["-24;24;-24", 113, 475], ["24;-24;24", 113, 475]].map(([v, cy, cx], k) => (
+            <g key={k}>
+              <path d={`M${cx} ${cy} V128`} stroke="#2a2f3a" strokeWidth="5.5" strokeLinecap="round" />
+              <ellipse cx={Number(cx) - 2} cy="130" rx="5" ry="2.6" fill="#15110e" />
+              <animateTransform attributeName="transform" type="rotate"
+                values={(v as string).split(";").map((a) => `${a} ${cx} ${cy}`).join(";")} dur="0.8s" repeatCount="indefinite" />
+            </g>
+          ))}
+          {[[467, "24;-24;24"], [483, "-24;24;-24"]].map(([sx, v], k) => (
+            <g key={k}>
+              <path d={`M${sx} 97 L${sx} 110`} stroke="#b4443a" strokeWidth="4.5" strokeLinecap="round" />
+              <circle cx={sx} cy="112" r="2.4" fill="#d9a679" />
+              <animateTransform attributeName="transform" type="rotate"
+                values={(v as string).split(";").map((a) => `${a} ${sx} 97`).join(";")} dur="0.8s" repeatCount="indefinite" />
+            </g>
+          ))}
+        </motion.g>
+        {/* torso, neck, head turned towards the car */}
+        <path d="M466 96 Q475 91 484 96 L485 115 Q475 119 465 115 Z" fill="#b4443a" />
+        <path d="M472 93 L475 100 L478 93 Z" fill="#e9dcc2" />
+        <rect x="473" y="87" width="4" height="6" fill="#d9a679" />
+        <circle cx="475" cy="81.5" r="7.5" fill="#d9a679" />
+        <polygon points="468.5,82.5 465.5,86 469.5,86" fill="#c8915f" />
+        <circle cx="478.5" cy="82.5" r="1.7" fill="#c8915f" />
+        <circle cx="471.8" cy="81.5" r="1.1" fill="#15110e" />
+        <path d="M467.4 81 A7.6 7.6 0 0 1 482.6 81 Q480 76.6 475 77.4 Q470 76.4 467.4 81 Z" fill="#2a1d16" />
         <motion.circle cx="475" cy="84" r="13" fill="none" stroke={TEAL_L} strokeWidth="2"
           animate={{ r: [10, 22], opacity: [0.8, 0] }} transition={{ duration: 2, repeat: Infinity, ease: "easeOut" }} />
       </motion.g>
@@ -393,11 +478,15 @@ export function CrossingDiagram() {
         {[68, 134].map((cx) => (
           <g key={cx}>
             <circle cx={cx} cy="198" r="12" fill={INK} />
-            <motion.g style={{ transformBox: "fill-box", transformOrigin: "50% 50%" }} animate={{ rotate: [0, 900, 900] }} transition={brake}>
+            <g>
               <circle cx={cx} cy="198" r="8" fill="#bdb6a8" />
               <path d={`M${cx - 8} 198 H${cx + 8} M${cx} 190 V206`} stroke={INK} strokeWidth="2" />
               <circle cx={cx + 5} cy="193" r="2" fill={AMBER} />
-            </motion.g>
+              <animateTransform attributeName="transform" type="rotate"
+                values={`0 ${cx} 198;1080 ${cx} 198;1080 ${cx} 198`}
+                keyTimes="0;0.5;1" calcMode="spline" keySplines="0.22 1 0.36 1;0 0 1 1"
+                dur={`${T}s`} repeatCount="indefinite" />
+            </g>
           </g>
         ))}
         <motion.g animate={{ opacity: [0, 0, 1, 1, 0] }} transition={{ duration: T, times: [0, 0.3, 0.45, 0.95, 1], repeat: Infinity }}>
