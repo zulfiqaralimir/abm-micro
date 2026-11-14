@@ -1,7 +1,7 @@
 "use client";
 
 import { animate, motion, useMotionValue } from "framer-motion";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const TEAL = "#2b5a6b";
 const TEAL_L = "#7fc0d3";
@@ -14,6 +14,19 @@ const ease = [0.22, 1, 0.36, 1] as const;
 const view = { once: true, margin: "-60px" } as const;
 
 function Figure({ caption, children, vb }: { caption: string; children: React.ReactNode; vb: string }) {
+  const box = useRef<HTMLDivElement | null>(null);
+  const [fs, setFs] = useState(false);
+  useEffect(() => {
+    const on = () => setFs(document.fullscreenElement === box.current);
+    document.addEventListener("fullscreenchange", on);
+    return () => document.removeEventListener("fullscreenchange", on);
+  }, []);
+  const toggle = () => {
+    try {
+      if (document.fullscreenElement) void document.exitFullscreen();
+      else void box.current?.requestFullscreen();
+    } catch {}
+  };
   return (
     <motion.figure
       initial={{ opacity: 0, y: 28 }}
@@ -22,12 +35,28 @@ function Figure({ caption, children, vb }: { caption: string; children: React.Re
       transition={{ duration: 0.8, ease }}
       className="not-prose my-10"
     >
-      <div className="overflow-hidden rounded-3xl border border-border bg-gradient-to-br from-paper-raised via-paper-raised to-accent/5 p-4 shadow-xl shadow-accent/5 sm:p-6">
-        <svg viewBox={vb} className="h-auto w-full" role="img" aria-label={caption}>
+      <div
+        ref={box}
+        onClick={toggle}
+        className={
+          fs
+            ? "relative flex h-screen w-screen cursor-zoom-out items-center justify-center bg-[#0f1a1f] p-4 sm:p-8"
+            : "group relative cursor-zoom-in overflow-hidden rounded-3xl border border-border bg-gradient-to-br from-paper-raised via-paper-raised to-accent/5 p-4 shadow-xl shadow-accent/5 sm:p-6"
+        }
+      >
+        <svg viewBox={vb} className={fs ? "h-full w-full" : "h-auto w-full"} role="img" aria-label={caption}>
           {children}
         </svg>
+        <button
+          type="button"
+          aria-label={fs ? "Exit full screen" : "View full screen"}
+          onClick={(e) => { e.stopPropagation(); toggle(); }}
+          className="absolute right-3 top-3 rounded-full bg-black/45 px-3 py-1 text-xs font-semibold tracking-wide text-white opacity-80 backdrop-blur transition hover:opacity-100 sm:right-5 sm:top-5"
+        >
+          {fs ? "✕ Close" : "⤢ Full screen"}
+        </button>
       </div>
-      <figcaption className="mt-3 text-center text-sm italic text-ink-muted">{caption}</figcaption>
+      {!fs && <figcaption className="mt-3 text-center text-sm italic text-ink-muted">{caption}</figcaption>}
     </motion.figure>
   );
 }
@@ -291,35 +320,38 @@ export function CrossingDiagram() {
       m.walkLegs?.setAttribute("display", walking ? "inline" : "none");
       m.walkArms?.setAttribute("display", walking ? "inline" : "none");
       if (!walking) { m.up?.setAttribute("transform", ""); return; }
-      // gait: thigh swings, knee flexes while the leg swings forward, stance foot stays on the ground
-      const phi = (y / 104) * 3.6 * 2 * Math.PI;
-      const HIP = 114.5, L = 8.6;
+      // Front-view gait (he walks towards us). Each leg cycles: stance (foot planted, slides back
+      // relative to the body as he advances) then swing (foot lifts and reaches forward = lower on screen).
+      const CYCLES = 4, STANCE = 0.6, S = 12;
+      const cyc = (y / 104) * CYCLES;
+      const HIP = 114.5;
+      const ease = (t: number) => t * t * (3 - 2 * t);
       const legs = [0, 1].map((k) => {
-        const p = phi + k * Math.PI;
-        const th = 0.46 * Math.sin(p);
-        const kf = 0.85 * Math.max(0, Math.cos(p));
-        const hx = k ? 478 : 472;
-        const kx = hx + L * Math.sin(th), ky = HIP + L * Math.cos(th);
-        const ax = kx + L * Math.sin(th - kf), ay = ky + L * Math.cos(th - kf);
+        const u = (((cyc + k * 0.5) % 1) + 1) % 1;
+        let off: number, lift = 0;
+        if (u < STANCE) off = S / 2 - S * (u / STANCE);
+        else { const t = (u - STANCE) / (1 - STANCE); off = -S / 2 + S * ease(t); lift = 4.2 * Math.sin(Math.PI * t); }
+        const hx = k ? 478 : 472, out = k ? 1 : -1;
+        const ax = hx + out * 0.9, ay = 129.5 + off * 0.55 - lift;
+        const kx = (hx + ax) / 2 + out * (0.8 + lift * 0.35), ky = (HIP + ay) / 2 - lift * 0.25;
         return { hx, kx, ky, ax, ay };
       });
-      const dy = 130 - Math.max(legs[0].ay, legs[1].ay); // keep the planted foot on the ground
+      const bob = -1.3 * Math.abs(Math.sin(cyc * 2 * Math.PI));
+      const sway = 0.9 * Math.sin(cyc * 2 * Math.PI);
       legs.forEach((g, k) => {
-        m.legs[k]?.setAttribute("d", `M${g.hx} ${HIP + dy} L${g.kx} ${g.ky + dy} L${g.ax} ${g.ay + dy}`);
-        m.feet[k]?.setAttribute("cx", String(g.ax + 1.6));
-        m.feet[k]?.setAttribute("cy", String(g.ay + dy + 1));
+        m.legs[k]?.setAttribute("d", `M${g.hx + sway * 0.5} ${HIP + bob} L${g.kx} ${g.ky} L${g.ax} ${g.ay}`);
+        m.feet[k]?.setAttribute("cx", String(g.ax));
+        m.feet[k]?.setAttribute("cy", String(g.ay + 1));
       });
-      m.up?.setAttribute("transform", `translate(0 ${dy})`);
+      m.up?.setAttribute("transform", `translate(${sway} ${bob})`);
       [0, 1].forEach((k) => {
-        const p = phi + (k ? 0 : Math.PI); // each arm swings against its own-side leg
-        const a = 0.4 * Math.sin(p);
-        const sx = k ? 483 : 467, sy = 97;
-        const ex = sx + 6.2 * Math.sin(a), ey = sy + 6.2 * Math.cos(a);
-        const b = a + 0.25 + 0.35 * Math.max(0, Math.sin(p));
-        const hx = ex + 5.6 * Math.sin(b), hy = ey + 5.6 * Math.cos(b);
-        m.arms[k]?.setAttribute("d", `M${sx} ${sy} L${ex} ${ey} L${hx} ${hy}`);
+        const sx = k ? 483 : 467, out = k ? 1 : -1;
+        const sw = Math.sin((cyc + (k ? 0 : 0.5)) * 2 * Math.PI); // swings against the same-side leg
+        const ex = sx + out * 1.6, ey = 103;
+        const hx = sx + out * (1.1 - 0.5 * sw), hy = 110.5 + 3.2 * sw;
+        m.arms[k]?.setAttribute("d", `M${sx} 97 L${ex} ${ey} L${hx} ${hy}`);
         m.hands[k]?.setAttribute("cx", String(hx));
-        m.hands[k]?.setAttribute("cy", String(hy));
+        m.hands[k]?.setAttribute("cy", String(hy + 1.6));
       });
     };
     const u2 = manY.on("change", place);
