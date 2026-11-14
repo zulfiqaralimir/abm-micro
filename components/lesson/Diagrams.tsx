@@ -699,7 +699,7 @@ export function ExamDiagram() {
   };
   const wood = "#b98a5a";
 
-  const student = (cx: number, o: { skin: string; skinD: string; hair: string; shirt: string; long: boolean; tired: boolean; delay: number; pen: boolean }) => {
+  const student = (cx: number, o: { skin: string; skinD: string; hair: string; shirt: string; long: boolean; tired: boolean; delay: number; pen: boolean; skinG: string; hairG: string; rim: number }) => {
     const arm = (side: 1 | -1) => `M${cx + side * 15} 177 Q${cx + side * 21} 188 ${cx + side * 19} 196 L${cx + side * 10} 203`;
     return (
       <g>
@@ -711,6 +711,8 @@ export function ExamDiagram() {
           {/* torso with collar and soft shading */}
           <path d={`M${cx - 19} 204 Q${cx - 21.5} 183 ${cx - 13} 176 Q${cx - 8} 173 ${cx} 173 Q${cx + 8} 173 ${cx + 13} 176 Q${cx + 21.5} 183 ${cx + 19} 204 Z`} fill={o.shirt} />
           <path d={`M${cx - 19} 204 Q${cx - 21.5} 183 ${cx - 13} 176 L${cx - 9} 204 Z`} fill="#000" opacity="0.15" />
+          <path d={`M${cx - 6} 190 Q${cx - 2} 196 ${cx - 4} 204 M${cx + 7} 188 Q${cx + 4} 196 ${cx + 6} 204`} stroke="#000" strokeWidth="0.9" opacity="0.14" fill="none" />
+          <path d={`M${cx + 13} 176 Q${cx + 21.5} 183 ${cx + 19} 204`} stroke="#ffd9a0" strokeWidth="1.5" opacity={o.rim} fill="none" strokeLinecap="round" />
           {o.long ? (
             <path d={`M${cx - 6.5} 173 L${cx} 183 L${cx + 6.5} 173 Q${cx} 177 ${cx - 6.5} 173 Z`} fill="#f3ecdd" />
           ) : (
@@ -729,21 +731,23 @@ export function ExamDiagram() {
           <g>
             <animateTransform attributeName="transform" type="rotate" values={`-1.6 ${cx} 172;1.8 ${cx} 172;-1.6 ${cx} 172`} dur={o.tired ? "4.4s" : "6.2s"} begin={`${o.delay}s`} repeatCount="indefinite" />
             <path d={`M${cx - 3.6} 163 L${cx - 3.6} 174 Q${cx} 177 ${cx + 3.6} 174 L${cx + 3.6} 163 Z`} fill={o.skinD} />
+            <ellipse cx={cx} cy="168.6" rx="6" ry="2.4" fill="#000" opacity="0.2" />
             <circle cx={cx - 8.9} cy="153.4" r="1.9" fill={o.skinD} />
             <circle cx={cx + 8.9} cy="153.4" r="1.9" fill={o.skinD} />
-            <path d={`M${cx - 8.8} 152 Q${cx - 9.2} 142.5 ${cx} 142 Q${cx + 9.2} 142.5 ${cx + 8.8} 152 Q${cx + 8.8} 161 ${cx + 5} 164.5 Q${cx} 167.8 ${cx - 5} 164.5 Q${cx - 8.8} 161 ${cx - 8.8} 152 Z`} fill={o.skin} />
+            <path d={`M${cx - 8.8} 152 Q${cx - 9.2} 142.5 ${cx} 142 Q${cx + 9.2} 142.5 ${cx + 8.8} 152 Q${cx + 8.8} 161 ${cx + 5} 164.5 Q${cx} 167.8 ${cx - 5} 164.5 Q${cx - 8.8} 161 ${cx - 8.8} 152 Z`} fill={`url(#${o.skinG})`} />
             <path d={`M${cx + 2} 143 Q${cx + 9.2} 144 ${cx + 8.8} 152 Q${cx + 8.8} 161 ${cx + 5} 164.5 Q${cx + 7} 156 ${cx + 2} 143 Z`} fill="#000" opacity="0.07" />
+            <path d={`M${cx + 8.8} 152 Q${cx + 8.8} 161 ${cx + 5} 164.5`} stroke="#ffd9a0" strokeWidth="1" opacity={o.rim} fill="none" strokeLinecap="round" />
             {/* hair */}
             {o.long ? (
               <g>
-                <path d={`M${cx - 9.8} 152 Q${cx - 11.2} 138.6 ${cx} 139 Q${cx + 11.2} 138.6 ${cx + 9.8} 152 Q${cx + 6.5} 145 ${cx} 145.2 Q${cx - 6.5} 145 ${cx - 9.8} 152 Z`} fill={o.hair} />
-                <path d={`M${cx - 9.8} 150 Q${cx - 12.8} 166 ${cx - 11.8} 181 L${cx - 7.6} 181 Q${cx - 8.8} 166 ${cx - 8.4} 153 Z`} fill={o.hair} />
-                <path d={`M${cx + 9.8} 150 Q${cx + 12.8} 166 ${cx + 11.8} 181 L${cx + 7.6} 181 Q${cx + 8.8} 166 ${cx + 8.4} 153 Z`} fill={o.hair} />
+                <path d={`M${cx - 9.8} 152 Q${cx - 11.2} 138.6 ${cx} 139 Q${cx + 11.2} 138.6 ${cx + 9.8} 152 Q${cx + 6.5} 145 ${cx} 145.2 Q${cx - 6.5} 145 ${cx - 9.8} 152 Z`} fill={`url(#${o.hairG})`} />
+                <path d={`M${cx - 9.8} 150 Q${cx - 12.8} 166 ${cx - 11.8} 181 L${cx - 7.6} 181 Q${cx - 8.8} 166 ${cx - 8.4} 153 Z`} fill={`url(#${o.hairG})`} />
+                <path d={`M${cx + 9.8} 150 Q${cx + 12.8} 166 ${cx + 11.8} 181 L${cx + 7.6} 181 Q${cx + 8.8} 166 ${cx + 8.4} 153 Z`} fill={`url(#${o.hairG})`} />
                 <path d={`M${cx - 4} 142 Q${cx} 140.6 ${cx + 4.4} 142.2`} stroke="#fff" strokeWidth="1" opacity="0.2" fill="none" strokeLinecap="round" />
               </g>
             ) : (
               <g>
-                <path d={`M${cx - 9.6} 150 Q${cx - 10.8} 138.6 ${cx} 139.4 Q${cx + 10.8} 138.6 ${cx + 9.6} 150 Q${cx + 6.4} 144.4 ${cx + 1.4} 145.4 Q${cx - 4.2} 143.6 ${cx - 9.6} 150 Z`} fill={o.hair} />
+                <path d={`M${cx - 9.6} 150 Q${cx - 10.8} 138.6 ${cx} 139.4 Q${cx + 10.8} 138.6 ${cx + 9.6} 150 Q${cx + 6.4} 144.4 ${cx + 1.4} 145.4 Q${cx - 4.2} 143.6 ${cx - 9.6} 150 Z`} fill={`url(#${o.hairG})`} />
                 <path d={`M${cx - 6} 141 L${cx - 7} 137.8 M${cx - 1} 139.6 L${cx - 1.4} 136.4 M${cx + 4} 140 L${cx + 5.4} 137`} stroke={o.hair} strokeWidth="1.5" strokeLinecap="round" />
                 <path d={`M${cx - 4} 141.6 Q${cx + 1} 140.4 ${cx + 5} 142`} stroke="#fff" strokeWidth="0.9" opacity="0.14" fill="none" strokeLinecap="round" />
               </g>
@@ -759,7 +763,8 @@ export function ExamDiagram() {
                   <animate attributeName="cx" values={`${cx + dx};${cx + dx - 0.8};${cx + dx - 0.8};${cx + dx}`} keyTimes="0;0.4;0.7;1" dur="6s" begin={`${o.delay}s`} repeatCount="indefinite" />
                   <animate attributeName="ry" values="1;1;0.1;1;1" keyTimes="0;0.9;0.94;0.98;1" dur="4.2s" begin={`${o.delay}s`} repeatCount="indefinite" />
                 </ellipse>
-                <path d={`M${cx + dx - 2.1} 152.7 Q${cx + dx} 151.8 ${cx + dx + 2.1} 152.7`} stroke="#3b2e29" strokeWidth="0.7" fill="none" />
+                <circle cx={cx + dx - 0.4} cy="153.2" r="0.34" fill="#fff" />
+                <path d={`M${cx + dx - 2.1} 152.7 Q${cx + dx} 151.8 ${cx + dx + 2.1} 152.7`} stroke="#2a1d16" strokeWidth="0.95" fill="none" strokeLinecap="round" />
                 {o.tired && <path d={`M${cx + dx - 2.2} 155.4 Q${cx + dx} 156.7 ${cx + dx + 2.2} 155.4`} stroke="#8f5f3e" strokeWidth="0.8" fill="none" opacity="0.7" />}
               </g>
             ))}
@@ -826,6 +831,36 @@ export function ExamDiagram() {
           <stop offset="0" stopColor="#5a463d" />
           <stop offset="1" stopColor="#2a211c" />
         </linearGradient>
+        <linearGradient id="ex-sky" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#7fb8d6" />
+          <stop offset="0.7" stopColor="#d9e8e6" />
+          <stop offset="1" stopColor="#f7e2b6" />
+        </linearGradient>
+        <linearGradient id="ex-curtain" x1="0" y1="0" x2="0.5" y2="0" spreadMethod="repeat">
+          <stop offset="0" stopColor="#d6b588" />
+          <stop offset="0.5" stopColor="#b8946a" />
+          <stop offset="1" stopColor="#d6b588" />
+        </linearGradient>
+        <linearGradient id="ex-skinA" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#e3b48a" />
+          <stop offset="1" stopColor="#c48a5c" />
+        </linearGradient>
+        <linearGradient id="ex-skinB" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#d6a276" />
+          <stop offset="1" stopColor="#ad774c" />
+        </linearGradient>
+        <linearGradient id="ex-hairA" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#4a342a" />
+          <stop offset="1" stopColor="#1a120e" />
+        </linearGradient>
+        <linearGradient id="ex-hairB" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#58402f" />
+          <stop offset="1" stopColor="#241812" />
+        </linearGradient>
+        <linearGradient id="ex-board" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#3b5f50" />
+          <stop offset="1" stopColor="#274337" />
+        </linearGradient>
         <linearGradient id="ex-ray" x1="0" y1="0" x2="1" y2="1">
           <stop offset="0" stopColor="#fff3c9" stopOpacity="0.55" />
           <stop offset="1" stopColor="#fff3c9" stopOpacity="0" />
@@ -839,13 +874,121 @@ export function ExamDiagram() {
       {[0, 1, 2, 3, 4, 5].map((k) => (
         <line key={k} x1="0" y1={186 + k * 18} x2="640" y2={186 + k * 18} stroke="#6e4b2f" strokeWidth="0.8" opacity="0.25" />
       ))}
-      {/* window and sunlight */}
-      <rect x="566" y="48" width="58" height="84" rx="4" fill="#cfe6ee" stroke="#e9dcc2" strokeWidth="4" />
-      <line x1="595" y1="48" x2="595" y2="132" stroke="#e9dcc2" strokeWidth="3" />
-      <line x1="566" y1="90" x2="624" y2="90" stroke="#e9dcc2" strokeWidth="3" />
-      <polygon points="566,132 624,132 470,260 360,260" fill="url(#ex-ray)" />
-      {/* board with chalk marks */}
-      <rect x="168" y="48" width="104" height="52" rx="3" fill="#2f4a3f" stroke="#8b6a43" strokeWidth="3" opacity="0.0" />
+      {/* window: deep frame, a real view outside, curtain, sill and plant */}
+      <rect x="558" y="38" width="76" height="106" rx="4" fill="#8a6a43" opacity="0.3" />
+      <rect x="562" y="42" width="68" height="98" rx="3" fill="#f1e6d0" stroke="#cdbb98" strokeWidth="1.2" />
+      <clipPath id="ex-win-clip"><rect x="567" y="47" width="58" height="88" /></clipPath>
+      <g clipPath="url(#ex-win-clip)">
+        <rect x="567" y="47" width="58" height="88" fill="url(#ex-sky)" />
+        <circle cx="610" cy="66" r="14" fill="#fff3c9" opacity="0.8" />
+        <circle cx="610" cy="66" r="5" fill="#fffbe6" />
+        {[[569, 112, 9, 23], [579, 104, 8, 31], [588, 116, 10, 19], [601, 108, 8, 27], [612, 114, 9, 21]].map(([x, y, w, h], i) => (
+          <rect key={i} x={x} y={y} width={w} height={h} fill="#7d9fae" opacity="0.75" />
+        ))}
+        <g>
+          <ellipse cx="578" cy="60" rx="12" ry="4" fill="#fff" opacity="0.8" />
+          <ellipse cx="586" cy="57" rx="8" ry="3.4" fill="#fff" opacity="0.85" />
+          <animateTransform attributeName="transform" type="translate" values="-30 0;70 0" dur="38s" repeatCount="indefinite" />
+        </g>
+        <g>
+          <path d="M0 0 q3 -3 6 0 q3 -3 6 0" stroke="#3b4a52" strokeWidth="1" fill="none" strokeLinecap="round">
+            <animate attributeName="opacity" values="1;0.2;1" dur="0.5s" repeatCount="indefinite" />
+          </path>
+          <animateTransform attributeName="transform" type="translate" values="560 84;640 70" dur="9s" repeatCount="indefinite" />
+        </g>
+        <rect x="592" y="112" width="3" height="23" fill="#6b4e32" />
+        <circle cx="593.5" cy="106" r="11" fill="#5f8a5b" />
+        <circle cx="589" cy="110" r="7" fill="#6e9a67" />
+        <circle cx="599" cy="109" r="6.5" fill="#527c50" />
+        <polygon points="567,135 625,135 625,128 567,126" fill="#6f8f5a" opacity="0.8" />
+      </g>
+      <rect x="593" y="47" width="3.4" height="88" fill="#f1e6d0" />
+      <rect x="567" y="88" width="58" height="3.2" fill="#f1e6d0" />
+      <rect x="567" y="47" width="58" height="88" fill="none" stroke="#cdbb98" strokeWidth="1" />
+      <polygon points="570,135 590,135 612,47 592,47" fill="#fff" opacity="0.14" />
+      <polygon points="600,135 606,135 622,47 617,47" fill="#fff" opacity="0.1" />
+      <rect x="556" y="141" width="80" height="6" rx="2" fill="#e6d8bd" stroke="#c9b894" strokeWidth="0.8" />
+      <rect x="556" y="146" width="80" height="2" fill="#000" opacity="0.12" />
+      {/* potted plant on the sill */}
+      <g>
+        <path d="M606 141 L608 131 L620 131 L622 141 Z" fill="#b4573f" />
+        <rect x="606" y="131" width="16" height="2.6" fill="#c9694d" />
+        <g>
+          <path d="M614 131 Q606 120 603 112" stroke="#4f7d4a" strokeWidth="2" fill="none" strokeLinecap="round" />
+          <path d="M614 131 Q616 118 614 108" stroke="#4f7d4a" strokeWidth="2" fill="none" strokeLinecap="round" />
+          <path d="M614 131 Q624 121 627 113" stroke="#4f7d4a" strokeWidth="2" fill="none" strokeLinecap="round" />
+          <ellipse cx="602" cy="111" rx="5" ry="2.6" transform="rotate(-35 602 111)" fill="#5f9a58" />
+          <ellipse cx="614" cy="106.5" rx="5" ry="2.6" transform="rotate(-90 614 106.5)" fill="#6aa862" />
+          <ellipse cx="628" cy="112" rx="5" ry="2.6" transform="rotate(35 628 112)" fill="#5f9a58" />
+          <animateTransform attributeName="transform" type="rotate" values="-1.5 614 131;1.5 614 131;-1.5 614 131" dur="4.5s" repeatCount="indefinite" />
+        </g>
+      </g>
+      {/* curtain, swaying slightly */}
+      <g transform="translate(552 38)">
+        <g>
+          <path d="M0 0 H22 Q19 40 24 74 Q20 96 14 104 L0 104 Z" fill="url(#ex-curtain)" />
+          <path d="M5 0 Q4 50 6 104 M11 0 Q10 50 12 100 M17 0 Q16 40 19 90" stroke="#7d5f3d" strokeWidth="0.8" opacity="0.35" fill="none" />
+          <path d="M0 62 Q12 66 23 60" stroke="#8a6a43" strokeWidth="2.4" fill="none" strokeLinecap="round" />
+          <animateTransform attributeName="transform" type="skewX" values="0;2.2;0" dur="5.2s" repeatCount="indefinite" />
+        </g>
+      </g>
+      <polygon points="566,135 628,135 470,260 360,260" fill="url(#ex-ray)" />
+      {[[508, 168, 0], [470, 188, 1.3], [432, 206, 2.4], [530, 196, 0.7]].map(([x, y, d]) => (
+        <circle key={`${x}-${y}`} cx={x} cy={y} r="1.3" fill="#fff8dc">
+          <animate attributeName="cy" values={`${y};${y - 14};${y}`} dur="6s" begin={`${d}s`} repeatCount="indefinite" />
+          <animate attributeName="opacity" values="0;0.8;0" dur="6s" begin={`${d}s`} repeatCount="indefinite" />
+        </circle>
+      ))}
+      {/* wainscot panelling and skirting */}
+      <rect x="0" y="150" width="640" height="21" fill="#b98a5a" opacity="0.55" />
+      <rect x="0" y="148" width="640" height="3" fill="#e0bd8c" />
+      {Array.from({ length: 11 }).map((_, k) => (
+        <rect key={k} x={k * 60 + 8} y="155" width="44" height="12" rx="1" fill="none" stroke="#8a6a43" strokeWidth="0.8" opacity="0.5" />
+      ))}
+
+      {/* chalkboard with a demand-curve sketch (the teacher stands in front of it) */}
+      <rect x="14" y="76" width="180" height="66" rx="3" fill="#8b6a43" />
+      <rect x="14" y="76" width="180" height="2" fill="#c9a574" opacity="0.7" />
+      <rect x="18" y="80" width="172" height="58" fill="url(#ex-board)" />
+      <ellipse cx="120" cy="108" rx="60" ry="18" fill="#fff" opacity="0.04" />
+      <path d="M28 128 V88 M28 128 H72" stroke="#e8efe8" strokeWidth="1.2" fill="none" strokeLinecap="round" opacity="0.9" />
+      <path d="M31 94 Q44 120 68 126" stroke="#f3c87a" strokeWidth="1.6" fill="none" strokeLinecap="round" />
+      <text x="22" y="92" fontSize="7" fill="#e8efe8" opacity="0.85">P</text>
+      <text x="70" y="136" fontSize="7" fill="#e8efe8" opacity="0.85">Q</text>
+      <path d="M152 94 h30 M152 104 h22 M152 114 h30 M152 124 h16" stroke="#e8efe8" strokeWidth="1.3" strokeLinecap="round" opacity="0.65" />
+      <rect x="16" y="141" width="176" height="3" rx="1" fill="#6e4b2f" />
+      <rect x="150" y="138.4" width="7" height="2.6" rx="1" fill="#f6f1e6" />
+      <rect x="160" y="139" width="5" height="2" rx="1" fill="#f3c87a" />
+
+      {/* wall clock with ticking hands */}
+      <circle cx="380" cy="68" r="17.6" fill="#000" opacity="0.18" />
+      <circle cx="380" cy="66" r="17" fill="#6e4b2f" />
+      <circle cx="380" cy="66" r="14.6" fill="#fbf8f0" />
+      {Array.from({ length: 12 }).map((_, k) => {
+        const a = (k * 30 * Math.PI) / 180;
+        const r1 = k % 3 === 0 ? 11.2 : 12.4;
+        return <line key={k} x1={380 + r1 * Math.sin(a)} y1={66 - r1 * Math.cos(a)} x2={380 + 13.6 * Math.sin(a)} y2={66 - 13.6 * Math.cos(a)} stroke="#3a2a1a" strokeWidth={k % 3 === 0 ? 1.3 : 0.7} />;
+      })}
+      <line x1="380" y1="66" x2="380" y2="58.4" stroke="#2a2f3a" strokeWidth="2" strokeLinecap="round">
+        <animateTransform attributeName="transform" type="rotate" values="304 380 66;664 380 66" dur="43200s" repeatCount="indefinite" />
+      </line>
+      <line x1="380" y1="66" x2="380" y2="54" stroke="#2a2f3a" strokeWidth="1.3" strokeLinecap="round">
+        <animateTransform attributeName="transform" type="rotate" values="48 380 66;408 380 66" dur="3600s" repeatCount="indefinite" />
+      </line>
+      <line x1="380" y1="70.5" x2="380" y2="52.6" stroke="#c0392b" strokeWidth="0.8" strokeLinecap="round">
+        <animateTransform attributeName="transform" type="rotate" calcMode="discrete" values={Array.from({ length: 61 }, (_, i) => `${i * 6} 380 66`).join(";")} dur="60s" repeatCount="indefinite" />
+      </line>
+      <circle cx="380" cy="66" r="1.4" fill="#c0392b" />
+
+      {/* school bags on the floor */}
+      {[[196, 0], [398, 1]].map(([x, k]) => (
+        <g key={x}>
+          <ellipse cx={x + 8} cy="244" rx="12" ry="3" fill="#000" opacity="0.25" />
+          <rect x={x} y="224" width="16" height="20" rx="5" fill={k ? "#8a3b3b" : "#2f5d7a"} />
+          <rect x={x + 3} y="234" width="10" height="7" rx="2" fill="#000" opacity="0.18" />
+          <path d={`M${x + 4} 224 Q${x + 8} 219 ${x + 12} 224`} stroke="#1f1a15" strokeWidth="1.6" fill="none" />
+        </g>
+      ))}
 
       {/* step labels */}
       {[
@@ -951,9 +1094,9 @@ export function ExamDiagram() {
       ))}
 
       {/* student A: understood */}
-      {student(A, { skin: "#d9a679", skinD: "#c8915f", hair: "#2a1d16", shirt: "#2b7a8a", long: true, tired: false, delay: 0, pen: false })}
+      {student(A, { skin: "#d9a679", skinD: "#c8915f", hair: "#2a1d16", shirt: "#2b7a8a", long: true, tired: false, delay: 0, pen: false, skinG: "ex-skinA", hairG: "ex-hairA", rim: 0.3 })}
       {/* student B: crammed */}
-      {student(B, { skin: "#c8915f", skinD: "#b07a4f", hair: "#3a2a1f", shirt: "#6e7f45", long: false, tired: true, delay: 1.1, pen: true })}
+      {student(B, { skin: "#c8915f", skinD: "#b07a4f", hair: "#3a2a1f", shirt: "#6e7f45", long: false, tired: true, delay: 1.1, pen: true, skinG: "ex-skinB", hairG: "ex-hairB", rim: 0.55 })}
 
       {/* traces from each grade up to the mind behind it */}
       {[A, B].map((cx, i) => (
