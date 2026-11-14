@@ -1,6 +1,6 @@
 "use client";
 
-import { animate, motion, useMotionValue } from "framer-motion";
+import { animate, motion, useMotionValue, useReducedMotion, useScroll, useTransform } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 
 const TEAL = "#2b5a6b";
@@ -15,7 +15,14 @@ const view = { once: true, margin: "-60px" } as const;
 
 function Figure({ caption, children, vb }: { caption: string; children: React.ReactNode; vb: string }) {
   const box = useRef<HTMLDivElement | null>(null);
+  const fig = useRef<HTMLElement | null>(null);
   const [fs, setFs] = useState(false);
+  // scroll-linked depth: the card drifts, scales up into focus at mid-screen, then eases away
+  const calm = useReducedMotion();
+  const { scrollYProgress } = useScroll({ target: fig, offset: ["start end", "end start"] });
+  const driftY = useTransform(scrollYProgress, [0, 1], calm ? [0, 0] : [36, -36]);
+  const driftScale = useTransform(scrollYProgress, [0, 0.3, 0.7, 1], calm ? [1, 1, 1, 1] : [0.93, 1, 1, 0.965]);
+  const glow = useTransform(scrollYProgress, [0, 0.35, 0.65, 1], [0, 1, 1, 0]);
   useEffect(() => {
     const on = () => setFs(document.fullscreenElement === box.current);
     document.addEventListener("fullscreenchange", on);
@@ -29,12 +36,21 @@ function Figure({ caption, children, vb }: { caption: string; children: React.Re
   };
   return (
     <motion.figure
+      ref={fig}
       initial={{ opacity: 0, y: 28 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={view}
       transition={{ duration: 0.8, ease }}
       className="not-prose my-10"
     >
+      <motion.div style={{ y: fs ? 0 : driftY, scale: fs ? 1 : driftScale }} className="relative">
+        {!fs && (
+          <motion.div
+            aria-hidden
+            style={{ opacity: glow }}
+            className="pointer-events-none absolute -inset-3 -z-10 rounded-[2rem] bg-gradient-to-br from-accent/25 via-transparent to-assumption/25 blur-2xl"
+          />
+        )}
       <div
         ref={box}
         onClick={toggle}
@@ -56,6 +72,7 @@ function Figure({ caption, children, vb }: { caption: string; children: React.Re
           {fs ? "✕ Close" : "⤢ Full screen"}
         </button>
       </div>
+      </motion.div>
       {!fs && <figcaption className="mt-3 text-center text-sm italic text-ink-muted">{caption}</figcaption>}
     </motion.figure>
   );

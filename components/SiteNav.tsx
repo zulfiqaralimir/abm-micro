@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { AnimatePresence, motion, useScroll, useSpring } from "framer-motion";
+import { AnimatePresence, motion, useScroll, useSpring, useTransform } from "framer-motion";
 import Logo from "./Logo";
 
 const stroke = { fill: "none", stroke: "currentColor", strokeWidth: 1.7, strokeLinecap: "round", strokeLinejoin: "round" } as const;
@@ -50,6 +50,7 @@ export default function SiteNav() {
   const [hover, setHover] = useState<string | null>(null);
   const { scrollYProgress } = useScroll();
   const progress = useSpring(scrollYProgress, { stiffness: 120, damping: 24 });
+  const dotLeft = useTransform(progress, (v) => `${Math.min(100, Math.max(0, v * 100))}%`);
 
   useEffect(() => setOpen(false), [pathname]);
   useEffect(() => {
@@ -177,7 +178,12 @@ export default function SiteNav() {
           {/* reading progress */}
           <motion.div
             style={{ scaleX: progress }}
-            className="absolute inset-x-0 bottom-0 h-[3px] origin-left bg-gradient-to-r from-accent via-[#4b8ea3] to-assumption"
+            className="absolute inset-x-0 bottom-0 h-[4px] origin-left bg-gradient-to-r from-accent via-[#4b8ea3] to-assumption shadow-[0_0_14px_rgba(75,142,163,0.75)]"
+          />
+          <motion.div
+            aria-hidden
+            style={{ left: dotLeft }}
+            className="pointer-events-none absolute bottom-[-3px] h-[10px] w-[10px] -translate-x-1/2 rounded-full bg-assumption shadow-[0_0_14px_5px_rgba(243,200,122,0.85)]"
           />
         </div>
       </motion.div>
