@@ -699,45 +699,83 @@ export function ExamDiagram() {
   };
   const wood = "#b98a5a";
 
-  const student = (cx: number, o: { skin: string; hair: string; shirt: string; long: boolean; tired: boolean; delay: number }) => (
-    <g>
+  const student = (cx: number, o: { skin: string; skinD: string; hair: string; shirt: string; long: boolean; tired: boolean; delay: number; pen: boolean }) => {
+    const hand = (side: 1 | -1) => {
+      const hx = cx + side * 12;
+      return `M${cx + side * 24} 176 Q${cx + side * 33} 192 ${cx + side * 27} 201 L${hx} 206`;
+    };
+    return (
       <g>
-        <animateTransform attributeName="transform" type="translate" values="0 0;0 -1.2;0 0" dur="3.4s" begin={`${o.delay}s`} repeatCount="indefinite" />
-        <path d={`M${cx - 26} 206 Q${cx - 28} 176 ${cx - 14} 170 L${cx + 14} 170 Q${cx + 28} 176 ${cx + 26} 206 Z`} fill={o.shirt} />
-        <path d={`M${cx - 26} 206 Q${cx - 28} 176 ${cx - 14} 170 L${cx - 14} 206 Z`} fill="#000" opacity="0.12" />
-        <rect x={cx - 4} y="160" width="8" height="12" fill={o.skin} />
-        <circle cx={cx} cy="150" r="12.5" fill={o.skin} />
-        {o.long ? (
-          <path d={`M${cx - 13.5} 150 Q${cx - 15} 132 ${cx} 133 Q${cx + 15} 132 ${cx + 13.5} 150 L${cx + 15} 174 Q${cx + 10} 168 ${cx + 10} 150 Q${cx} 141 ${cx - 10} 150 Q${cx - 10} 168 ${cx - 15} 174 Z`} fill={o.hair} />
-        ) : (
-          <path d={`M${cx - 13} 148 Q${cx - 14} 133 ${cx} 134 Q${cx + 14} 133 ${cx + 13} 148 Q${cx + 8} 140 ${cx} 141 Q${cx - 8} 140 ${cx - 13} 148 Z`} fill={o.hair} />
-        )}
-        {[-4.6, 4.6].map((dx) => (
-          <ellipse key={dx} cx={cx + dx} cy="151" rx="1.5" ry="1.5" fill="#15110e">
-            <animate attributeName="ry" values="1.5;1.5;0.15;1.5;1.5" keyTimes="0;0.9;0.94;0.98;1" dur="4.2s" begin={`${o.delay}s`} repeatCount="indefinite" />
-          </ellipse>
+        {/* chair back */}
+        <rect x={cx - 31} y="158" width="62" height="52" rx="9" fill="#5e4029" />
+        <rect x={cx - 31} y="158" width="62" height="4" rx="2" fill="#8f6742" />
+        <g>
+          <animateTransform attributeName="transform" type="translate" values="0 0;0 -1.1;0 0" dur="3.6s" begin={`${o.delay}s`} repeatCount="indefinite" />
+          <path d={`M${cx - 28} 208 Q${cx - 31} 178 ${cx - 15} 172 L${cx + 15} 172 Q${cx + 31} 178 ${cx + 28} 208 Z`} fill={o.shirt} />
+          <path d={`M${cx - 28} 208 Q${cx - 31} 178 ${cx - 15} 172 L${cx - 12} 208 Z`} fill="#000" opacity="0.14" />
+          <path d={`M${cx - 6} 172 Q${cx} 178 ${cx + 6} 172`} stroke="#000" strokeWidth="1" opacity="0.25" fill="none" />
+          {/* arms resting on the desk; the right hand moves with the pen */}
+          <path d={hand(-1)} stroke={o.shirt} strokeWidth="8.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+          <circle cx={cx - 11} cy="206" r="3.2" fill={o.skin} />
+          <path stroke={o.shirt} strokeWidth="8.5" strokeLinecap="round" strokeLinejoin="round" fill="none" d={hand(1)}>
+          </path>
+          <g>
+            <circle cx={cx + 12} cy="206" r="3.2" fill={o.skin} />
+            <line x1={cx + 12} y1="206" x2={cx + 20} y2="198" stroke="#2a2f3a" strokeWidth="1.6" strokeLinecap="round" />
+            <animateTransform attributeName="transform" type="translate" values="0 0;-3 1;0 0" dur={o.pen ? "0.7s" : "3.2s"} begin={`${o.delay}s`} repeatCount="indefinite" />
+          </g>
+          {/* head: tilts gently, eyes drift between paper and teacher */}
+          <g>
+            <animateTransform attributeName="transform" type="rotate" values={`-1.6 ${cx} 170;1.8 ${cx} 170;-1.6 ${cx} 170`} dur={o.tired ? "4.4s" : "6.2s"} begin={`${o.delay}s`} repeatCount="indefinite" />
+            <rect x={cx - 4.2} y="160" width="8.4" height="13" rx="3" fill={o.skinD} />
+            <circle cx={cx - 12.2} cy="151.5" r="2.5" fill={o.skinD} />
+            <circle cx={cx + 12.2} cy="151.5" r="2.5" fill={o.skinD} />
+            <ellipse cx={cx} cy="150" rx="12" ry="13.4" fill={o.skin} />
+            <ellipse cx={cx - 4} cy="146" rx="5" ry="6" fill="#fff" opacity="0.08" />
+            {o.long ? (
+              <path d={`M${cx - 13} 150 Q${cx - 15.5} 131 ${cx} 132.5 Q${cx + 15.5} 131 ${cx + 13} 150 L${cx + 15} 176 Q${cx + 10.5} 170 ${cx + 10.5} 150 Q${cx} 140 ${cx - 10.5} 150 Q${cx - 10.5} 170 ${cx - 15} 176 Z`} fill={o.hair} />
+            ) : (
+              <path d={`M${cx - 12.6} 148 Q${cx - 14} 133 ${cx} 134 Q${cx + 14} 133 ${cx + 12.6} 148 Q${cx + 8} 140.5 ${cx} 141.5 Q${cx - 8} 140.5 ${cx - 12.6} 148 Z`} fill={o.hair} />
+            )}
+            <path d={`M${cx - 6} 137 Q${cx} 134.5 ${cx + 5} 137`} stroke="#fff" strokeWidth="1.3" opacity="0.18" fill="none" strokeLinecap="round" />
+            {/* brows, eyes, nose, mouth */}
+            {[-1, 1].map((sd) => (
+              <path key={sd} d={o.tired ? `M${cx + sd * 7.6} ${146.4 - sd * 0.6} Q${cx + sd * 4.6} 145.4 ${cx + sd * 2.4} ${146.6 + sd * 0.4}` : `M${cx + sd * 7.4} 146.2 Q${cx + sd * 4.6} 144.6 ${cx + sd * 2.4} 146`} stroke={o.hair} strokeWidth="1.1" fill="none" strokeLinecap="round" />
+            ))}
+            {[-4.8, 4.8].map((dx) => (
+              <g key={dx}>
+                <ellipse cx={cx + dx} cy="151" rx="2.3" ry="1.7" fill="#fff" />
+                <ellipse cx={cx + dx} cy="151" rx="1.15" ry="1.15" fill="#2a1d16">
+                  <animate attributeName="cx" values={`${cx + dx};${cx + dx - 0.9};${cx + dx - 0.9};${cx + dx}`} keyTimes="0;0.4;0.7;1" dur="6s" begin={`${o.delay}s`} repeatCount="indefinite" />
+                  <animate attributeName="ry" values="1.15;1.15;0.12;1.15;1.15" keyTimes="0;0.9;0.94;0.98;1" dur="4.2s" begin={`${o.delay}s`} repeatCount="indefinite" />
+                </ellipse>
+              </g>
+            ))}
+            {o.tired && [-4.8, 4.8].map((dx) => (
+              <path key={dx} d={`M${cx + dx - 2.6} 154.4 Q${cx + dx} 156.6 ${cx + dx + 2.6} 154.4`} stroke="#9a6a45" strokeWidth="0.9" fill="none" opacity="0.8" />
+            ))}
+            <path d={`M${cx} 151.5 Q${cx - 1.8} 156 ${cx + 0.6} 156.4`} stroke="#9a6a45" strokeWidth="0.9" fill="none" strokeLinecap="round" />
+            <path d={o.tired ? `M${cx - 3.6} 159.6 Q${cx} 160.2 ${cx + 3.6} 159.4` : `M${cx - 4.2} 158.6 Q${cx} 162.2 ${cx + 4.2} 158.6`} stroke="#8a4b3a" strokeWidth="1.1" fill="none" strokeLinecap="round" />
+          </g>
+        </g>
+        {/* desk: lit top, wooden front, soft shadow */}
+        <ellipse cx={cx} cy="246" rx="74" ry="5" fill="#000" opacity="0.3" />
+        <rect x={cx - 66} y="196" width="132" height="20" rx="3" fill={wood} />
+        <rect x={cx - 66} y="196" width="132" height="3" fill="#e0bd8c" />
+        <rect x={cx - 66} y="216" width="132" height="28" fill="url(#ex-wood)" />
+        <rect x={cx - 66} y="216" width="132" height="2" fill="#000" opacity="0.25" />
+        <polygon points={`${cx - 33},213 ${cx + 35},213 ${cx + 29},200 ${cx - 27},200`} fill="#000" opacity="0.16" />
+        <polygon points={`${cx - 34},212 ${cx + 34},212 ${cx + 28},199 ${cx - 28},199`} fill="#fbf8f0" stroke="#d9d0bd" strokeWidth="0.8" />
+        {[0, 1, 2].map((k) => (
+          <line key={k} x1={cx - 24 + k * 1.5} y1={202 + k * 3.4} x2={cx + 4 - k * 2} y2={202 + k * 3.4} stroke="#a9a193" strokeWidth="0.9" />
         ))}
-        {o.tired && [-4.6, 4.6].map((dx) => (
-          <path key={dx} d={`M${cx + dx - 2.4} 154.5 Q${cx + dx} 156.5 ${cx + dx + 2.4} 154.5`} stroke="#b07a4f" strokeWidth="0.9" fill="none" />
-        ))}
-        <path d={o.tired ? `M${cx - 3.4} 158.2 Q${cx} 158.8 ${cx + 3.4} 158.2` : `M${cx - 4} 157 Q${cx} 161 ${cx + 4} 157`} stroke="#8a4b3a" strokeWidth="1.1" fill="none" strokeLinecap="round" />
+        <motion.g {...grade}>
+          <circle cx={cx + 15} cy="206" r="6.8" fill="none" stroke="#c0392b" strokeWidth="1.6" />
+          <text x={cx + 15} y="209.6" textAnchor="middle" fontSize="9.5" fontWeight="800" fill="#c0392b">B+</text>
+        </motion.g>
       </g>
-      {/* desk: lit top, wooden front */}
-      <rect x={cx - 66} y="196" width="132" height="20" rx="3" fill={wood} />
-      <rect x={cx - 66} y="196" width="132" height="3" fill="#e0bd8c" />
-      <rect x={cx - 66} y="216" width="132" height="28" fill="url(#ex-wood)" />
-      <rect x={cx - 66} y="216" width="132" height="2" fill="#000" opacity="0.25" />
-      {/* the exam paper with its grade */}
-      <polygon points={`${cx - 34},212 ${cx + 34},212 ${cx + 28},199 ${cx - 28},199`} fill="#fbf8f0" stroke="#d9d0bd" strokeWidth="0.8" />
-      {[0, 1, 2].map((k) => (
-        <line key={k} x1={cx - 24 + k * 1.5} y1={202 + k * 3.4} x2={cx + 4 - k * 2} y2={202 + k * 3.4} stroke="#a9a193" strokeWidth="0.9" />
-      ))}
-      <motion.g {...grade}>
-        <circle cx={cx + 15} cy="206" r="6.8" fill="none" stroke="#c0392b" strokeWidth="1.6" />
-        <text x={cx + 15} y="209.6" textAnchor="middle" fontSize="9.5" fontWeight="800" fill="#c0392b">B+</text>
-      </motion.g>
-    </g>
-  );
+    );
+  };
 
   const A = 280, B = 480;
   const nodes: [number, number][] = [[-50, 10], [-24, -14], [-2, -24], [6, 8], [32, -12], [52, 10]];
@@ -794,28 +832,51 @@ export function ExamDiagram() {
 
       {/* the teacher, marking */}
       <g>
-        <animateTransform attributeName="transform" type="translate" values="0 0;0 -1;0 0" dur="3.8s" repeatCount="indefinite" />
-        <ellipse cx="100" cy="236" rx="30" ry="5" fill="#000" opacity="0.28" />
-        <path d="M90 190 V232 M110 190 V232" stroke="#2a2f3a" strokeWidth="9" strokeLinecap="round" />
-        <ellipse cx="88" cy="234" rx="8" ry="3.4" fill="#15110e" />
-        <ellipse cx="112" cy="234" rx="8" ry="3.4" fill="#15110e" />
-        <path d="M76 196 Q74 150 88 144 L112 144 Q126 150 124 196 Z" fill="#7a3b52" />
-        <path d="M94 144 L100 160 L106 144 Z" fill="#f3ecdd" />
-        <path d="M76 150 Q70 178 74 200" stroke="#7a3b52" strokeWidth="9" strokeLinecap="round" fill="none" />
-        <circle cx="74" cy="203" r="4" fill="#d9a679" />
-        <path d="M124 150 Q134 160 138 142" stroke="#7a3b52" strokeWidth="9" strokeLinecap="round" fill="none" />
-        <circle cx="139" cy="139" r="4" fill="#d9a679" />
-        <line x1="140" y1="136" x2="148" y2="122" stroke="#c0392b" strokeWidth="2.4" strokeLinecap="round" />
-        <rect x="96" y="132" width="8" height="12" fill="#d9a679" />
-        <circle cx="100" cy="122" r="12" fill="#d9a679" />
-        <path d="M87.5 121 Q86 105 100 106 Q114 105 112.5 121 Q108 112 100 112 Q92 112 87.5 121 Z" fill="#4a3a33" />
-        <circle cx="100" cy="103" r="6.5" fill="#4a3a33" />
-        {[-4.4, 4.4].map((dx) => (
-          <ellipse key={dx} cx={100 + dx} cy="123" rx="1.4" ry="1.4" fill="#15110e">
-            <animate attributeName="ry" values="1.4;1.4;0.15;1.4;1.4" keyTimes="0;0.88;0.92;0.96;1" dur="4.6s" repeatCount="indefinite" />
-          </ellipse>
-        ))}
-        <path d="M96 129 Q100 132 104 129" stroke="#8a4b3a" strokeWidth="1.1" fill="none" strokeLinecap="round" />
+        <animateTransform attributeName="transform" type="translate" values="0 0;0 -0.9;0 0" dur="3.8s" repeatCount="indefinite" />
+        <ellipse cx="100" cy="237" rx="32" ry="5" fill="#000" opacity="0.28" />
+        <path d="M91 196 V232 M109 196 V232" stroke="#2a2f3a" strokeWidth="8.5" strokeLinecap="round" />
+        <ellipse cx="89" cy="234.5" rx="8" ry="3.4" fill="#15110e" />
+        <ellipse cx="111" cy="234.5" rx="8" ry="3.4" fill="#15110e" />
+        <path d="M78 204 Q76 156 90 148 L110 148 Q124 156 122 204 Z" fill="#7a3b52" />
+        <path d="M78 204 Q76 156 90 148 L92 204 Z" fill="#000" opacity="0.14" />
+        <path d="M94 148 L100 163 L106 148 Z" fill="#f3ecdd" />
+        {/* left arm holds a clipboard at the waist */}
+        <path d="M80 156 Q70 178 80 192 L96 190" stroke="#7a3b52" strokeWidth="8.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+        <rect x="86" y="176" width="20" height="26" rx="2" fill="#8a6a43" />
+        <rect x="88" y="179" width="16" height="21" fill="#fbf8f0" />
+        <circle cx="97" cy="192" r="3.2" fill="#d9a679" />
+        {/* right arm raised, red pen marks in the air */}
+        <g>
+          <path d="M120 156 Q136 164 140 148" stroke="#7a3b52" strokeWidth="8.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+          <circle cx="141" cy="144" r="3.4" fill="#d9a679" />
+          <line x1="141" y1="144" x2="150" y2="130" stroke="#c0392b" strokeWidth="2.4" strokeLinecap="round" />
+          <animateTransform attributeName="transform" type="translate" values="0 0;3 -3;-1 1;0 0" dur="2.6s" repeatCount="indefinite" />
+        </g>
+        {/* head turns between the two papers */}
+        <g>
+          <animateTransform attributeName="transform" type="rotate" values="-4 100 136;4 100 136;-4 100 136" dur="6.5s" repeatCount="indefinite" />
+          <rect x="95.6" y="134" width="8.8" height="14" rx="3" fill="#c8915f" />
+          <circle cx="87.6" cy="123" r="2.5" fill="#c8915f" />
+          <circle cx="112.4" cy="123" r="2.5" fill="#c8915f" />
+          <ellipse cx="100" cy="122" rx="12" ry="13.4" fill="#d9a679" />
+          <path d="M87.4 121 Q85.5 104 100 105.5 Q114.5 104 112.6 121 Q108 111.5 100 111.5 Q92 111.5 87.4 121 Z" fill="#4a3a33" />
+          <circle cx="100" cy="101.5" r="7" fill="#4a3a33" />
+          <ellipse cx="97" cy="104" rx="3" ry="1.2" fill="#fff" opacity="0.14" />
+          {[-1, 1].map((sd) => (
+            <path key={sd} d={`M${100 + sd * 7.2} 117 Q${100 + sd * 4.6} 115.6 ${100 + sd * 2.4} 117`} stroke="#4a3a33" strokeWidth="1.1" fill="none" strokeLinecap="round" />
+          ))}
+          {[-4.8, 4.8].map((dx) => (
+            <g key={dx}>
+              <ellipse cx={100 + dx} cy="122" rx="2.3" ry="1.7" fill="#fff" />
+              <ellipse cx={100 + dx} cy="122" rx="1.15" ry="1.15" fill="#2a1d16">
+                <animate attributeName="cx" values={`${100 + dx};${100 + dx + 1};${100 + dx - 1};${100 + dx}`} keyTimes="0;0.35;0.7;1" dur="6.5s" repeatCount="indefinite" />
+                <animate attributeName="ry" values="1.15;1.15;0.12;1.15;1.15" keyTimes="0;0.88;0.92;0.96;1" dur="4.6s" repeatCount="indefinite" />
+              </ellipse>
+            </g>
+          ))}
+          <path d="M100 123 Q98.2 127.6 100.6 128" stroke="#9a6a45" strokeWidth="0.9" fill="none" strokeLinecap="round" />
+          <path d="M95.8 131 Q100 134 104.2 131" stroke="#8a4b3a" strokeWidth="1.1" fill="none" strokeLinecap="round" />
+        </g>
       </g>
       {/* the teacher's question */}
       <motion.g {...asking}>
@@ -835,9 +896,9 @@ export function ExamDiagram() {
       ))}
 
       {/* student A: understood */}
-      {student(A, { skin: "#d9a679", hair: "#2a1d16", shirt: "#2b7a8a", long: true, tired: false, delay: 0 })}
+      {student(A, { skin: "#d9a679", skinD: "#c8915f", hair: "#2a1d16", shirt: "#2b7a8a", long: true, tired: false, delay: 0, pen: false })}
       {/* student B: crammed */}
-      {student(B, { skin: "#c8915f", hair: "#3a2a1f", shirt: "#6e7f45", long: false, tired: true, delay: 1.1 })}
+      {student(B, { skin: "#c8915f", skinD: "#b07a4f", hair: "#3a2a1f", shirt: "#6e7f45", long: false, tired: true, delay: 1.1, pen: true })}
 
       {/* traces from each grade up to the mind behind it */}
       {[A, B].map((cx, i) => (

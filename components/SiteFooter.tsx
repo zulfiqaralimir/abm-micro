@@ -118,7 +118,14 @@ export default function SiteFooter() {
         </div>
 
         <div className="mt-14 flex flex-col items-center justify-between gap-4 border-t border-white/10 pt-6 text-sm text-white/50 sm:flex-row">
-          <p>© {new Date().getFullYear()} ABM Micro. Course content by Asad Zaman.</p>
+          <div className="space-y-1.5 text-center sm:text-left">
+            <p>© {new Date().getFullYear()} ABM Micro. Course content by Asad Zaman.</p>
+            <p className="text-white/70">
+              <span className="font-semibold text-white/90">Zulfiqar Ali Mir</span>, CEO, Black Iron Quantum AI (Private) Limited
+              {" · "}
+              <a href="tel:+923225150501" className="transition-colors hover:text-[#f3c87a]">+92 322 5150501</a>
+            </p>
+          </div>
           <button
             type="button"
             onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
