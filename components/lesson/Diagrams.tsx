@@ -293,6 +293,9 @@ export function CrossingDiagram() {
           <stop offset="0" stopColor="#ff5a4a" stopOpacity="0.9" />
           <stop offset="1" stopColor="#ff5a4a" stopOpacity="0" />
         </radialGradient>
+        <filter id="cx-glow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="4" />
+        </filter>
       </defs>
 
       {/* dusk sky, sun, skyline */}
@@ -308,6 +311,38 @@ export function CrossingDiagram() {
               transition={{ duration: 3 + ((i + r) % 3), delay: (i * 0.7 + r * 0.4) % 3, repeat: Infinity }} />
           ))}
         </g>
+      ))}
+
+      {/* drifting clouds */}
+      {[[60, 52, 0], [380, 40, 1]].map(([y0, w, k]) => (
+        <motion.g key={k} initial={{ x: -120 }} animate={{ x: [-120, 700] }}
+          transition={{ duration: 40 + k * 15, repeat: Infinity, ease: "linear", delay: -k * 20 }}>
+          <ellipse cx="0" cy={y0 - 10 + k * 14} rx={w} ry="9" fill="#fff" opacity="0.28" />
+          <ellipse cx={w / 2} cy={y0 - 16 + k * 14} rx={w / 1.6} ry="8" fill="#fff" opacity="0.22" />
+        </motion.g>
+      ))}
+
+      {/* lamp posts with glow */}
+      {[262, 590].map((x, i) => (
+        <g key={x}>
+          <rect x={x - 2} y="68" width="4" height="52" fill="#1f4350" />
+          <motion.circle cx={x} cy="66" r="14" fill="#ffd98a" filter="url(#cx-glow)"
+            animate={{ opacity: [0.5, 0.95, 0.5] }} transition={{ duration: 3.5, delay: i * 1.2, repeat: Infinity, ease: "easeInOut" }} />
+          <circle cx={x} cy="66" r="4" fill="#fff3c9" />
+        </g>
+      ))}
+
+      {/* story steps, lit in sequence */}
+      {[
+        { x: 118, label: "1 · YOU SEE THE CAR SLOW", t: [0, 0.05, 0.4, 0.45] },
+        { x: 320, label: "2 · YOU INFER AN INTENTION", t: [0.4, 0.5, 0.65, 0.7] },
+        { x: 522, label: "3 · YOU ACT", t: [0.65, 0.72, 0.95, 1] },
+      ].map((s) => (
+        <motion.g key={s.label} animate={{ opacity: [0.25, 1, 1, 0.25] }}
+          transition={{ duration: T, times: s.t, repeat: Infinity }}>
+          <rect x={s.x - 98} y="10" width="196" height="22" rx="11" fill="#0f2a33" opacity="0.55" />
+          <text x={s.x} y="25" textAnchor="middle" fontSize="10.5" fontWeight="800" letterSpacing="1.5" fill="#fff">{s.label}</text>
+        </motion.g>
       ))}
 
       {/* pavement, road, kerb */}
@@ -358,15 +393,21 @@ export function CrossingDiagram() {
         {[68, 134].map((cx) => (
           <g key={cx}>
             <circle cx={cx} cy="198" r="12" fill={INK} />
-            <motion.g style={{ transformOrigin: `${cx}px 198px` }} animate={{ rotate: [0, 900, 900] }} transition={brake}>
-              <circle cx={cx} cy="198" r="6" fill="#bdb6a8" />
-              <path d={`M${cx - 6} 198 H${cx + 6} M${cx} 192 V204`} stroke={INK} strokeWidth="2" />
+            <motion.g style={{ transformBox: "fill-box", transformOrigin: "50% 50%" }} animate={{ rotate: [0, 900, 900] }} transition={brake}>
+              <circle cx={cx} cy="198" r="8" fill="#bdb6a8" />
+              <path d={`M${cx - 8} 198 H${cx + 8} M${cx} 190 V206`} stroke={INK} strokeWidth="2" />
+              <circle cx={cx + 5} cy="193" r="2" fill={AMBER} />
             </motion.g>
           </g>
         ))}
         <motion.g animate={{ opacity: [0, 0, 1, 1, 0] }} transition={{ duration: T, times: [0, 0.3, 0.45, 0.95, 1], repeat: Infinity }}>
           <circle cx="94" cy="128" r="3.5" fill={TEAL} />
           <circle cx="86" cy="117" r="5.5" fill={TEAL} />
+          {[0, 1].map((k) => (
+            <motion.ellipse key={k} cx="100" cy="88" rx="68" ry="23" fill="none" stroke={TEAL_L} strokeWidth="1.5"
+              animate={{ rx: [68, 100], ry: [23, 40], opacity: [0.6, 0] }}
+              transition={{ duration: 2.4, delay: k * 1.2, repeat: Infinity, ease: "easeOut" }} />
+          ))}
           <motion.ellipse cx="100" cy="88" rx="68" ry="23" fill={TEAL} stroke={TEAL_L} strokeWidth="2" strokeDasharray="5 5"
             animate={{ ry: [23, 25, 23] }} transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }} />
           <text x="100" y="93" textAnchor="middle" fontSize="14" fontWeight="600" fill="#fff">“I'll stop”</text>
