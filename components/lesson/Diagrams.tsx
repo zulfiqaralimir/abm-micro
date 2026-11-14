@@ -264,6 +264,9 @@ export function CrossingDiagram() {
   // rolled (angle = distance / radius), so spin and travel always match and slow together.
   const carX = useMotionValue(-190);
   const wheelRefs = useRef<(SVGGElement | null)[]>([]);
+  const manRef = useRef<SVGGElement | null>(null);
+  const manY = useMotionValue(0);
+  const manO = useMotionValue(1);
   useEffect(() => {
     const R = 12;
     const hubs = [68, 134];
@@ -271,16 +274,28 @@ export function CrossingDiagram() {
       const deg = ((x + 190) * 180) / (Math.PI * R);
       hubs.forEach((cx, i) => wheelRefs.current[i]?.setAttribute("transform", `rotate(${deg} ${cx} 198)`));
     });
+    // the man: waits at the kerb, then walks across the road once the car has stopped
+    const place = () => {
+      const y = manY.get();
+      const sc = 1 + (y / 104) * 0.18;
+      manRef.current?.setAttribute("transform", `translate(0 ${y}) translate(475 130) scale(${sc}) translate(-475 -130)`);
+      manRef.current?.setAttribute("opacity", String(manO.get()));
+    };
+    const u2 = manY.on("change", place);
+    const u3 = manO.on("change", place);
+    const times = [0, 0.55, 0.93, 0.96, 0.99, 1];
+    const cy = animate(manY, [0, 0, 104, 104, 0, 0], { duration: T, times, ease: "linear", repeat: Infinity });
+    const co = animate(manO, [1, 1, 1, 0, 0, 1], { duration: T, times, ease: "linear", repeat: Infinity });
     const ctl = animate(carX, 190, { duration: T / 2, ease: "easeOut", repeat: Infinity, repeatDelay: T / 2 });
-    return () => { unsub(); ctl.stop(); };
+    return () => { unsub(); u2(); u3(); ctl.stop(); cy.stop(); co.stop(); };
   }, [carX]);
   const carTimes = [0, 0.5, 1];
   const brake = { duration: T, times: carTimes, repeat: Infinity, ease: ["easeOut", "linear"] as ["easeOut", "linear"] };
   // far haze layer, then near buildings: [x, width, height, roof]
   const far = [[0, 50, 40], [44, 38, 56], [120, 44, 44], [210, 40, 52], [300, 56, 38], [380, 40, 54], [450, 50, 42], [540, 44, 56], [596, 50, 44]];
-  const near: [number, number, number, string][] = [
-    [4, 40, 54, "flat"], [46, 34, 38, "tank"], [262 + 18, 38, 46, "flat"], [320, 44, 60, "antenna"],
-    [368, 36, 40, "slope"], [410, 26, 34, "flat"], [520, 44, 56, "tank"], [566, 30, 42, "slope"], [600, 36, 62, "antenna"],
+  const near: [number, number, number, string, string][] = [
+    [4, 40, 54, "flat", "#a9927a"], [46, 34, 38, "tank", "#8f5a49"], [280, 38, 46, "flat", "#c9b896"], [322, 44, 60, "antenna", "#6c8591"],
+    [370, 36, 40, "slope", "#b08a68"], [410, 26, 34, "flat", "#7d8f96"], [520, 44, 56, "tank", "#a47a5e"], [566, 30, 42, "slope", "#c4b08c"], [600, 36, 62, "antenna", "#5f7a86"],
   ];
   const win = (i: number, r: number, c: number) => (i * 7 + r * 13 + c * 5) % 4 !== 0;
   return (
@@ -295,6 +310,24 @@ export function CrossingDiagram() {
           <stop offset="0" stopColor="#fff3c9" stopOpacity="0.95" />
           <stop offset="1" stopColor="#fff3c9" stopOpacity="0" />
         </radialGradient>
+        <linearGradient id="cx-shade" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0" stopColor="#0b1c24" stopOpacity="0.5" />
+          <stop offset="0.6" stopColor="#0b1c24" stopOpacity="0.12" />
+          <stop offset="1" stopColor="#ffb86b" stopOpacity="0.18" />
+        </linearGradient>
+        <linearGradient id="cx-dusk" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#ffcf8f" stopOpacity="0.18" />
+          <stop offset="1" stopColor="#0b1c24" stopOpacity="0.35" />
+        </linearGradient>
+        <linearGradient id="cx-win-lit" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#fff0b8" />
+          <stop offset="1" stopColor="#f0a94a" />
+        </linearGradient>
+        <linearGradient id="cx-win-dark" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#c9a374" />
+          <stop offset="0.5" stopColor="#35525f" />
+          <stop offset="1" stopColor="#1a2b33" />
+        </linearGradient>
         <linearGradient id="cx-road" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0" stopColor="#57534b" />
           <stop offset="1" stopColor="#35322d" />
@@ -353,36 +386,58 @@ export function CrossingDiagram() {
         <path key={wx} d={`M${wx - 4} 118 V108 A4 5 0 0 1 ${wx + 4} 108 V118 Z`} fill="#ffe29a" opacity="0.75" />
       ))}
 
-      {/* near buildings with window grids and rooftop details */}
-      {near.map(([x, w, h, roof], i) => {
+      {/* near buildings: lit facades, cornices, framed windows, balconies, shopfronts */}
+      {near.map(([x, w, h, roof, tone], i) => {
         const top = 118 - h;
-        const cols = Math.floor((w - 8) / 10);
-        const rows = Math.floor((h - 10) / 12);
+        const cols = Math.max(1, Math.floor((w - 8) / 10));
+        const rows = Math.max(1, Math.floor((h - 20) / 12));
+        const pad = (w - cols * 10) / 2 + 1.5;
         return (
           <g key={i}>
-            <rect x={x} y={top} width={w} height={h} fill="#1f4350" />
-            <rect x={x} y={top} width="3" height={h} fill="#2b5a6b" opacity="0.7" />
+            {roof === "slope" && <polygon points={`${x - 2},${top} ${x + w / 2},${top - 11} ${x + w + 2},${top}`} fill="#a4503e" />}
+            {roof === "slope" && <polygon points={`${x + w / 2},${top - 11} ${x + w + 2},${top} ${x + w / 2},${top}`} fill="#7c3a2e" />}
+            <rect x={x} y={top} width={w} height={h} fill={tone} />
+            <rect x={x} y={top} width={w} height={h} fill="url(#cx-shade)" />
+            <rect x={x} y={top} width={w} height={h} fill="url(#cx-dusk)" />
+            <rect x={x + w - 2.5} y={top} width="2.5" height={h} fill="#ffd9a0" opacity="0.35" />
+            <rect x={x - 1.5} y={top - 2.5} width={w + 3} height="3" fill="#e9dcc2" opacity="0.8" />
+            <rect x={x - 1.5} y={top + 0.5} width={w + 3} height="1.4" fill="#000" opacity="0.25" />
             {roof === "tank" && (
-              <g fill="#1f4350"><rect x={x + 8} y={top - 9} width="14" height="9" rx="2" /><rect x={x + 12} y={top - 12} width="6" height="3" /></g>
+              <g><rect x={x + 6} y={top - 12} width="14" height="9" rx="2" fill="#5b6a70" /><rect x={x + 8} y={top - 4} width="2" height="3" fill="#3d484d" /><rect x={x + 16} y={top - 4} width="2" height="3" fill="#3d484d" /></g>
             )}
             {roof === "antenna" && (
-              <g stroke="#1f4350" strokeWidth="2"><line x1={x + w / 2} y1={top} x2={x + w / 2} y2={top - 16} /><line x1={x + w / 2 - 5} y1={top - 10} x2={x + w / 2 + 5} y2={top - 10} /></g>
+              <g stroke="#2a3a40" strokeWidth="1.6"><line x1={x + w / 2} y1={top - 3} x2={x + w / 2} y2={top - 19} /><line x1={x + w / 2 - 6} y1={top - 12} x2={x + w / 2 + 6} y2={top - 12} /><line x1={x + w / 2 - 4} y1={top - 16} x2={x + w / 2 + 4} y2={top - 16} /></g>
             )}
-            {roof === "slope" && <polygon points={`${x - 2},${top} ${x + w / 2},${top - 10} ${x + w + 2},${top}`} fill="#183843" />}
+            {roof === "flat" && <rect x={x + w - 12} y={top - 8} width="5" height="6" fill="#4a5459" />}
             {Array.from({ length: rows }).flatMap((_, r) =>
               Array.from({ length: cols }).map((__, c) => {
-                const wx = x + 7 + c * 10;
-                const wy = top + 7 + r * 12;
-                if (!win(i, r, c)) return <rect key={`${r}-${c}`} x={wx} y={wy} width="5" height="7" rx="1" fill="#2b5a6b" opacity="0.6" />;
-                if ((i + r + c) % 5 === 0)
-                  return (
-                    <motion.rect key={`${r}-${c}`} x={wx} y={wy} width="5" height="7" rx="1" fill="#ffe29a"
-                      animate={{ opacity: [0.3, 1, 0.3] }}
-                      transition={{ duration: 3 + ((i + r) % 3), delay: (i * 0.7 + c * 0.4) % 3, repeat: Infinity }} />
-                  );
-                return <rect key={`${r}-${c}`} x={wx} y={wy} width="5" height="7" rx="1" fill="#ffe29a" opacity="0.85" />;
+                const wx = x + pad + c * 10;
+                const wy = top + 8 + r * 12;
+                const lit = (i * 7 + r * 13 + c * 5) % 4 !== 0;
+                const blink = lit && (i + r + c) % 5 === 0;
+                return (
+                  <g key={`${r}-${c}`}>
+                    <rect x={wx - 1} y={wy - 1} width="8.5" height="10.5" rx="0.8" fill="#e6dcc6" opacity="0.75" />
+                    <rect x={wx} y={wy} width="6.5" height="8.5" fill={lit ? "url(#cx-win-lit)" : "url(#cx-win-dark)"} />
+                    {blink && (
+                      <motion.rect x={wx} y={wy} width="6.5" height="8.5" fill="#1b2c33"
+                        animate={{ opacity: [0, 0.8, 0] }}
+                        transition={{ duration: 4 + ((i + r) % 3), delay: (i * 0.7 + c * 0.9) % 4, repeat: Infinity }} />
+                    )}
+                    <line x1={wx + 3.25} y1={wy} x2={wx + 3.25} y2={wy + 8.5} stroke="#e6dcc6" strokeWidth="0.6" opacity="0.8" />
+                    {(r + i) % 2 === 1 && (
+                      <g><rect x={wx - 1.5} y={wy + 8.7} width="9.5" height="1.6" fill="#1b2c33" opacity="0.85" /><path d={`M${wx - 0.5} ${wy + 8.7} v-2.6 M${wx + 2} ${wy + 8.7} v-2.6 M${wx + 4.5} ${wy + 8.7} v-2.6 M${wx + 7} ${wy + 8.7} v-2.6`} stroke="#1b2c33" strokeWidth="0.6" opacity="0.7" /></g>
+                    )}
+                  </g>
+                );
               })
             )}
+            {/* shopfront with striped awning and lit door */}
+            <rect x={x} y="108" width={w} height="10" fill="#14262d" />
+            {Array.from({ length: Math.floor(w / 6) }).map((_, k) => (
+              <rect key={k} x={x + k * 6} y="106" width="6" height="4" fill={k % 2 ? "#f3e7cf" : (i % 2 ? "#b4443a" : "#2b7a8a")} />
+            ))}
+            <rect x={x + 5} y="111" width={Math.max(8, w - 14)} height="7" fill="url(#cx-win-lit)" opacity="0.9" />
           </g>
         );
       })}
@@ -432,10 +487,7 @@ export function CrossingDiagram() {
       ))}
 
       {/* pedestrian */}
-      <motion.g
-        animate={{ y: [0, 0, 104, 104, 0, 0], scale: [1, 1, 1.18, 1.18, 1, 1], opacity: [1, 1, 1, 0, 0, 1] }}
-        transition={{ duration: T, times: [0, 0.55, 0.93, 0.96, 0.99, 1], repeat: Infinity, ease: "linear" }}
-      >
+      <g ref={manRef}>
         <ellipse cx="475" cy="130" rx="14" ry="3" fill="#000" opacity="0.25" />
         {/* standing pose: legs and arms at rest */}
         <motion.g animate={{ opacity: [1, 1, 0, 0, 1, 1] }} transition={{ duration: T, times: [0, 0.55, 0.56, 0.93, 0.94, 1], repeat: Infinity }}>
@@ -476,7 +528,7 @@ export function CrossingDiagram() {
         <path d="M467.4 81 A7.6 7.6 0 0 1 482.6 81 Q480 76.6 475 77.4 Q470 76.4 467.4 81 Z" fill="#2a1d16" />
         <motion.circle cx="475" cy="84" r="13" fill="none" stroke={TEAL_L} strokeWidth="2"
           animate={{ r: [10, 22], opacity: [0.8, 0] }} transition={{ duration: 2, repeat: Infinity, ease: "easeOut" }} />
-      </motion.g>
+      </g>
 
       {/* the car */}
       <motion.g style={{ x: carX }}>
