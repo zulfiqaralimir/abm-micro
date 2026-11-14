@@ -265,6 +265,10 @@ export function CrossingDiagram() {
   const carX = useMotionValue(-190);
   const wheelRefs = useRef<(SVGGElement | null)[]>([]);
   const manRef = useRef<SVGGElement | null>(null);
+  const man = useRef<{
+    standLegs: SVGGElement | null; walkLegs: SVGGElement | null; standArms: SVGGElement | null; walkArms: SVGGElement | null; up: SVGGElement | null;
+    legs: (SVGPathElement | null)[]; feet: (SVGEllipseElement | null)[]; arms: (SVGPathElement | null)[]; hands: (SVGCircleElement | null)[];
+  }>({ standLegs: null, walkLegs: null, standArms: null, walkArms: null, up: null, legs: [], feet: [], arms: [], hands: [] });
   const manY = useMotionValue(0);
   const manO = useMotionValue(1);
   useEffect(() => {
@@ -277,9 +281,46 @@ export function CrossingDiagram() {
     // the man: waits at the kerb, then walks across the road once the car has stopped
     const place = () => {
       const y = manY.get();
+      const m = man.current;
       const sc = 1 + (y / 104) * 0.18;
       manRef.current?.setAttribute("transform", `translate(0 ${y}) translate(475 130) scale(${sc}) translate(-475 -130)`);
       manRef.current?.setAttribute("opacity", String(manO.get()));
+      const walking = y > 0.3;
+      m.standLegs?.setAttribute("display", walking ? "none" : "inline");
+      m.standArms?.setAttribute("display", walking ? "none" : "inline");
+      m.walkLegs?.setAttribute("display", walking ? "inline" : "none");
+      m.walkArms?.setAttribute("display", walking ? "inline" : "none");
+      if (!walking) { m.up?.setAttribute("transform", ""); return; }
+      // gait: thigh swings, knee flexes while the leg swings forward, stance foot stays on the ground
+      const phi = (y / 104) * 3.6 * 2 * Math.PI;
+      const HIP = 114.5, L = 8.6;
+      const legs = [0, 1].map((k) => {
+        const p = phi + k * Math.PI;
+        const th = 0.46 * Math.sin(p);
+        const kf = 0.85 * Math.max(0, Math.cos(p));
+        const hx = k ? 478 : 472;
+        const kx = hx + L * Math.sin(th), ky = HIP + L * Math.cos(th);
+        const ax = kx + L * Math.sin(th - kf), ay = ky + L * Math.cos(th - kf);
+        return { hx, kx, ky, ax, ay };
+      });
+      const dy = 130 - Math.max(legs[0].ay, legs[1].ay); // keep the planted foot on the ground
+      legs.forEach((g, k) => {
+        m.legs[k]?.setAttribute("d", `M${g.hx} ${HIP + dy} L${g.kx} ${g.ky + dy} L${g.ax} ${g.ay + dy}`);
+        m.feet[k]?.setAttribute("cx", String(g.ax + 1.6));
+        m.feet[k]?.setAttribute("cy", String(g.ay + dy + 1));
+      });
+      m.up?.setAttribute("transform", `translate(0 ${dy})`);
+      [0, 1].forEach((k) => {
+        const p = phi + (k ? 0 : Math.PI); // each arm swings against its own-side leg
+        const a = 0.4 * Math.sin(p);
+        const sx = k ? 483 : 467, sy = 97;
+        const ex = sx + 6.2 * Math.sin(a), ey = sy + 6.2 * Math.cos(a);
+        const b = a + 0.25 + 0.35 * Math.max(0, Math.sin(p));
+        const hx = ex + 5.6 * Math.sin(b), hy = ey + 5.6 * Math.cos(b);
+        m.arms[k]?.setAttribute("d", `M${sx} ${sy} L${ex} ${ey} L${hx} ${hy}`);
+        m.hands[k]?.setAttribute("cx", String(hx));
+        m.hands[k]?.setAttribute("cy", String(hy));
+      });
     };
     const u2 = manY.on("change", place);
     const u3 = manO.on("change", place);
@@ -486,48 +527,47 @@ export function CrossingDiagram() {
         <rect key={i} x="438" y={140 + i * 19} width="74" height="11" fill="#f6f1e6" opacity="0.9" />
       ))}
 
-      {/* pedestrian */}
+      {/* pedestrian: stride is driven by distance walked (see place() above) */}
       <g ref={manRef}>
         <ellipse cx="475" cy="130" rx="14" ry="3" fill="#000" opacity="0.25" />
-        {/* standing pose: legs and arms at rest */}
-        <motion.g animate={{ opacity: [1, 1, 0, 0, 1, 1] }} transition={{ duration: T, times: [0, 0.55, 0.56, 0.93, 0.94, 1], repeat: Infinity }}>
-          <path d="M471 113 V128 M479 113 V128" stroke="#2a2f3a" strokeWidth="5.5" strokeLinecap="round" />
+        <g ref={(el) => { man.current.standLegs = el; }}>
+          <path d="M471 114 V128 M479 114 V128" stroke="#2a2f3a" strokeWidth="5.5" strokeLinecap="round" />
           <ellipse cx="469.5" cy="130" rx="5" ry="2.6" fill="#15110e" />
           <ellipse cx="480.5" cy="130" rx="5" ry="2.6" fill="#15110e" />
-          <path d="M466 97 L464 111 M484 97 L486 111" stroke="#b4443a" strokeWidth="4.5" strokeLinecap="round" />
-          <circle cx="464" cy="113" r="2.4" fill="#d9a679" />
-          <circle cx="486" cy="113" r="2.4" fill="#d9a679" />
-        </motion.g>
-        {/* walking pose: legs and arms swing while he steps off */}
-        <motion.g animate={{ opacity: [0, 0, 1, 1, 0, 0] }} transition={{ duration: T, times: [0, 0.55, 0.56, 0.93, 0.94, 1], repeat: Infinity }}>
-          {[["-24;24;-24", 113, 475], ["24;-24;24", 113, 475]].map(([v, cy, cx], k) => (
+        </g>
+        <g display="none" ref={(el) => { man.current.walkLegs = el; }}>
+          {[0, 1].map((k) => (
             <g key={k}>
-              <path d={`M${cx} ${cy} V128`} stroke="#2a2f3a" strokeWidth="5.5" strokeLinecap="round" />
-              <ellipse cx={Number(cx) - 2} cy="130" rx="5" ry="2.6" fill="#15110e" />
-              <animateTransform attributeName="transform" type="rotate"
-                values={(v as string).split(";").map((a) => `${a} ${cx} ${cy}`).join(";")} dur="0.8s" repeatCount="indefinite" />
+              <path ref={(el) => { man.current.legs[k] = el; }} d="M0 0" fill="none" stroke="#2a2f3a" strokeWidth="5.4" strokeLinecap="round" strokeLinejoin="round" />
+              <ellipse ref={(el) => { man.current.feet[k] = el; }} rx="5" ry="2.5" fill="#15110e" />
             </g>
           ))}
-          {[[467, "24;-24;24"], [483, "-24;24;-24"]].map(([sx, v], k) => (
-            <g key={k}>
-              <path d={`M${sx} 97 L${sx} 110`} stroke="#b4443a" strokeWidth="4.5" strokeLinecap="round" />
-              <circle cx={sx} cy="112" r="2.4" fill="#d9a679" />
-              <animateTransform attributeName="transform" type="rotate"
-                values={(v as string).split(";").map((a) => `${a} ${sx} 97`).join(";")} dur="0.8s" repeatCount="indefinite" />
-            </g>
-          ))}
-        </motion.g>
-        {/* torso, neck, head turned towards the car */}
-        <path d="M466 96 Q475 91 484 96 L485 115 Q475 119 465 115 Z" fill="#b4443a" />
-        <path d="M472 93 L475 100 L478 93 Z" fill="#e9dcc2" />
-        <rect x="473" y="87" width="4" height="6" fill="#d9a679" />
-        <circle cx="475" cy="81.5" r="7.5" fill="#d9a679" />
-        <polygon points="468.5,82.5 465.5,86 469.5,86" fill="#c8915f" />
-        <circle cx="478.5" cy="82.5" r="1.7" fill="#c8915f" />
-        <circle cx="471.8" cy="81.5" r="1.1" fill="#15110e" />
-        <path d="M467.4 81 A7.6 7.6 0 0 1 482.6 81 Q480 76.6 475 77.4 Q470 76.4 467.4 81 Z" fill="#2a1d16" />
-        <motion.circle cx="475" cy="84" r="13" fill="none" stroke={TEAL_L} strokeWidth="2"
-          animate={{ r: [10, 22], opacity: [0.8, 0] }} transition={{ duration: 2, repeat: Infinity, ease: "easeOut" }} />
+        </g>
+        <g ref={(el) => { man.current.up = el; }}>
+          <g ref={(el) => { man.current.standArms = el; }}>
+            <path d="M466 97 L464 111 M484 97 L486 111" stroke="#b4443a" strokeWidth="4.5" strokeLinecap="round" />
+            <circle cx="464" cy="113" r="2.4" fill="#d9a679" />
+            <circle cx="486" cy="113" r="2.4" fill="#d9a679" />
+          </g>
+          <g display="none" ref={(el) => { man.current.walkArms = el; }}>
+            {[0, 1].map((k) => (
+              <g key={k}>
+                <path ref={(el) => { man.current.arms[k] = el; }} d="M0 0" fill="none" stroke="#b4443a" strokeWidth="4.3" strokeLinecap="round" strokeLinejoin="round" />
+                <circle ref={(el) => { man.current.hands[k] = el; }} r="2.4" fill="#d9a679" />
+              </g>
+            ))}
+          </g>
+          <path d="M466 96 Q475 91 484 96 L485 115 Q475 119 465 115 Z" fill="#b4443a" />
+          <path d="M472 93 L475 100 L478 93 Z" fill="#e9dcc2" />
+          <rect x="473" y="87" width="4" height="6" fill="#d9a679" />
+          <circle cx="475" cy="81.5" r="7.5" fill="#d9a679" />
+          <polygon points="468.5,82.5 465.5,86 469.5,86" fill="#c8915f" />
+          <circle cx="478.5" cy="82.5" r="1.7" fill="#c8915f" />
+          <circle cx="471.8" cy="81.5" r="1.1" fill="#15110e" />
+          <path d="M467.4 81 A7.6 7.6 0 0 1 482.6 81 Q480 76.6 475 77.4 Q470 76.4 467.4 81 Z" fill="#2a1d16" />
+          <motion.circle cx="475" cy="84" r="13" fill="none" stroke={TEAL_L} strokeWidth="2"
+            animate={{ r: [10, 22], opacity: [0.8, 0] }} transition={{ duration: 2, repeat: Infinity, ease: "easeOut" }} />
+        </g>
       </g>
 
       {/* the car */}
