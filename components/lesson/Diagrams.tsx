@@ -1,6 +1,7 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { animate, motion, useMotionValue } from "framer-motion";
+import { useEffect, useRef } from "react";
 
 const TEAL = "#2b5a6b";
 const TEAL_L = "#7fc0d3";
@@ -259,6 +260,20 @@ export function ThreeTestsDiagram() {
 /* 0 — at the crossing: the car you see, the intention you cannot */
 export function CrossingDiagram() {
   const T = 8;
+  // One driver for everything physical: the car's x. Wheels turn by exactly the distance
+  // rolled (angle = distance / radius), so spin and travel always match and slow together.
+  const carX = useMotionValue(-190);
+  const wheelRefs = useRef<(SVGGElement | null)[]>([]);
+  useEffect(() => {
+    const R = 12;
+    const hubs = [68, 134];
+    const unsub = carX.on("change", (x) => {
+      const deg = ((x + 190) * 180) / (Math.PI * R);
+      hubs.forEach((cx, i) => wheelRefs.current[i]?.setAttribute("transform", `rotate(${deg} ${cx} 198)`));
+    });
+    const ctl = animate(carX, 190, { duration: T / 2, ease: "easeOut", repeat: Infinity, repeatDelay: T / 2 });
+    return () => { unsub(); ctl.stop(); };
+  }, [carX]);
   const carTimes = [0, 0.5, 1];
   const brake = { duration: T, times: carTimes, repeat: Infinity, ease: ["easeOut", "linear"] as ["easeOut", "linear"] };
   // far haze layer, then near buildings: [x, width, height, roof]
@@ -285,8 +300,15 @@ export function CrossingDiagram() {
           <stop offset="1" stopColor="#35322d" />
         </linearGradient>
         <linearGradient id="cx-body" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#e0a548" />
-          <stop offset="1" stopColor="#a8701c" />
+          <stop offset="0" stopColor="#eef1f3" />
+          <stop offset="0.3" stopColor="#b9c1c8" />
+          <stop offset="0.62" stopColor="#7d868e" />
+          <stop offset="1" stopColor="#3f454b" />
+        </linearGradient>
+        <linearGradient id="cx-glass" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#a9c8d6" />
+          <stop offset="0.5" stopColor="#35525f" />
+          <stop offset="1" stopColor="#1a2b33" />
         </linearGradient>
         <linearGradient id="cx-beam" x1="0" y1="0" x2="1" y2="0">
           <stop offset="0" stopColor="#fff3c9" stopOpacity="0.75" />
@@ -411,12 +433,12 @@ export function CrossingDiagram() {
 
       {/* pedestrian */}
       <motion.g
-        animate={{ y: [0, 0, 40, 40, 0], opacity: [1, 1, 1, 1, 0] }}
-        transition={{ duration: T, times: [0, 0.55, 0.7, 0.95, 1], repeat: Infinity, ease: "easeInOut" }}
+        animate={{ y: [0, 0, 104, 104, 0, 0], scale: [1, 1, 1.18, 1.18, 1, 1], opacity: [1, 1, 1, 0, 0, 1] }}
+        transition={{ duration: T, times: [0, 0.55, 0.93, 0.96, 0.99, 1], repeat: Infinity, ease: "linear" }}
       >
         <ellipse cx="475" cy="130" rx="14" ry="3" fill="#000" opacity="0.25" />
         {/* standing pose: legs and arms at rest */}
-        <motion.g animate={{ opacity: [1, 1, 0, 0, 1] }} transition={{ duration: T, times: [0, 0.55, 0.56, 0.95, 1], repeat: Infinity }}>
+        <motion.g animate={{ opacity: [1, 1, 0, 0, 1, 1] }} transition={{ duration: T, times: [0, 0.55, 0.56, 0.93, 0.94, 1], repeat: Infinity }}>
           <path d="M471 113 V128 M479 113 V128" stroke="#2a2f3a" strokeWidth="5.5" strokeLinecap="round" />
           <ellipse cx="469.5" cy="130" rx="5" ry="2.6" fill="#15110e" />
           <ellipse cx="480.5" cy="130" rx="5" ry="2.6" fill="#15110e" />
@@ -425,7 +447,7 @@ export function CrossingDiagram() {
           <circle cx="486" cy="113" r="2.4" fill="#d9a679" />
         </motion.g>
         {/* walking pose: legs and arms swing while he steps off */}
-        <motion.g animate={{ opacity: [0, 0, 1, 1, 0] }} transition={{ duration: T, times: [0, 0.55, 0.56, 0.95, 1], repeat: Infinity }}>
+        <motion.g animate={{ opacity: [0, 0, 1, 1, 0, 0] }} transition={{ duration: T, times: [0, 0.55, 0.56, 0.93, 0.94, 1], repeat: Infinity }}>
           {[["-24;24;-24", 113, 475], ["24;-24;24", 113, 475]].map(([v, cy, cx], k) => (
             <g key={k}>
               <path d={`M${cx} ${cy} V128`} stroke="#2a2f3a" strokeWidth="5.5" strokeLinecap="round" />
@@ -457,35 +479,53 @@ export function CrossingDiagram() {
       </motion.g>
 
       {/* the car */}
-      <motion.g initial={{ x: -190 }} animate={{ x: [-190, 190, 190] }} transition={brake}>
+      <motion.g style={{ x: carX }}>
         <motion.g animate={{ opacity: [1, 0, 0] }} transition={brake}>
           {[0, 1, 2].map((i) => (
             <rect key={i} x={-30 - i * 6} y={158 + i * 14} width={60 + i * 10} height="3" rx="1.5" fill="#fff" opacity="0.5" />
           ))}
         </motion.g>
-        <polygon points="158,172 330,140 330,214 158,184" fill="url(#cx-beam)" />
-        <ellipse cx="100" cy="206" rx="64" ry="5" fill="#000" opacity="0.3" />
-        <rect x="40" y="158" width="120" height="40" rx="13" fill="url(#cx-body)" />
-        <path d="M62 158 L78 134 H128 L146 158 Z" fill="#f3c87a" />
-        <rect x="84" y="140" width="18" height="15" rx="3" fill="#dff0f5" />
-        <rect x="108" y="140" width="20" height="15" rx="3" fill="#dff0f5" />
-        <circle cx="94" cy="148" r="4" fill={INK} />
-        <circle cx="158" cy="172" r="4" fill="#fff3c9" />
-        <circle cx="42" cy="170" r="14" fill="url(#cx-red)" />
-        <motion.circle cx="42" cy="170" r="12" fill="url(#cx-red)"
+        <polygon points="168,172 340,138 340,216 168,184" fill="url(#cx-beam)" />
+        <ellipse cx="104" cy="207" rx="74" ry="5" fill="#000" opacity="0.45" />
+        {/* body: sedan silhouette in metallic paint */}
+        <path d="M36 192 Q34 176 40 170 L52 166 L68 163 L80 141 Q84 134 94 133 L124 133 Q134 134 141 146 L156 160 L165 165 Q171 170 171 180 L171 192 Q170 199 162 199 L44 199 Q36 199 36 192 Z" fill="url(#cx-body)" />
+        <path d="M44 199 L162 199 L162 193 L44 193 Z" fill="#000" opacity="0.28" />
+        {/* glass */}
+        <path d="M80 158 L86 141 Q88 138 94 138 L105 138 L105 158 Z" fill="url(#cx-glass)" />
+        <path d="M109 158 L109 138 L122 138 Q128 139 133 148 L141 158 Z" fill="url(#cx-glass)" />
+        <path d="M112 156 L116 140 M118 156 L122 140" stroke="#fff" strokeWidth="2" opacity="0.18" />
+        <path d="M82 134 Q94 131 124 131" stroke="#fff" strokeWidth="1.2" opacity="0.55" fill="none" />
+        {/* panel lines, handles, trim */}
+        <path d="M44 168 L152 164" stroke="#fff" strokeWidth="1.2" opacity="0.55" fill="none" />
+        <path d="M107 138 V196 M71 164 V196 M148 161 V196" stroke="#2b2f33" strokeWidth="0.9" opacity="0.7" />
+        <rect x="112" y="168" width="9" height="2.6" rx="1.3" fill="#d8dde0" />
+        <rect x="79" y="168" width="9" height="2.6" rx="1.3" fill="#d8dde0" />
+        <path d="M46 190 L160 190" stroke="#dfe3e6" strokeWidth="1" opacity="0.5" />
+        <ellipse cx="140" cy="152" rx="4.5" ry="3" fill="#8f98a0" />
+        {/* lights: headlight, grille, taillight */}
+        <path d="M159 168 L169 170 L170 177 L160 175 Z" fill="#fff6d6" />
+        <rect x="168" y="180" width="3" height="10" rx="1" fill="#1b1d20" />
+        <circle cx="168" cy="173" r="9" fill="#fff3c9" opacity="0.35" filter="url(#cx-glow)" />
+        <path d="M36 172 L41 170 L42 178 L36 181 Z" fill="#8f1d16" />
+        <circle cx="38" cy="175" r="16" fill="url(#cx-red)" />
+        <motion.circle cx="38" cy="175" r="13" fill="url(#cx-red)"
           animate={{ opacity: [0, 1, 1] }} transition={{ ...brake, times: [0, 0.2, 1] }} />
-        <rect x="40" y="166" width="5" height="9" rx="2" fill="#ff5a4a" />
-        {[68, 134].map((cx) => (
+        <motion.path d="M36 172 L41 170 L42 178 L36 181 Z" fill="#ff5a4a"
+          animate={{ opacity: [0.2, 1, 1] }} transition={{ ...brake, times: [0, 0.2, 1] }} />
+        {/* wheels: arch, tyre, 5-spoke alloy that spins by the distance rolled */}
+        {[68, 134].map((cx, wi) => (
           <g key={cx}>
-            <circle cx={cx} cy="198" r="12" fill={INK} />
-            <g>
-              <circle cx={cx} cy="198" r="8" fill="#bdb6a8" />
-              <path d={`M${cx - 8} 198 H${cx + 8} M${cx} 190 V206`} stroke={INK} strokeWidth="2" />
-              <circle cx={cx + 5} cy="193" r="2" fill={AMBER} />
-              <animateTransform attributeName="transform" type="rotate"
-                values={`0 ${cx} 198;1080 ${cx} 198;1080 ${cx} 198`}
-                keyTimes="0;0.5;1" calcMode="spline" keySplines="0.22 1 0.36 1;0 0 1 1"
-                dur={`${T}s`} repeatCount="indefinite" />
+            <circle cx={cx} cy="198" r="15.5" fill="#0e0c0a" />
+            <circle cx={cx} cy="198" r="12.5" fill="#1a1816" />
+            <circle cx={cx} cy="198" r="12.5" fill="none" stroke="#35312c" strokeWidth="1" />
+            <g ref={(el) => { wheelRefs.current[wi] = el; }}>
+              <circle cx={cx} cy="198" r="8.5" fill="#cfd4d8" />
+              {[0, 1, 2, 3, 4].map((k) => {
+                const a = (k * 72 * Math.PI) / 180;
+                return <path key={k} d={`M${cx} 198 L${cx + 7.3 * Math.sin(a)} ${198 - 7.3 * Math.cos(a)}`} stroke="#5f656b" strokeWidth="2.6" strokeLinecap="round" />;
+              })}
+              <circle cx={cx} cy="198" r="2.4" fill="#8b9096" />
+              <circle cx={cx} cy="198" r="8.5" fill="none" stroke="#f3f5f6" strokeWidth="0.8" opacity="0.7" />
             </g>
           </g>
         ))}
