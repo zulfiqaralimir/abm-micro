@@ -123,7 +123,7 @@ export default function SiteFooter() {
             <p className="text-white/70">
               <span className="font-semibold text-white/90">Zulfiqar Ali Mir</span>, CEO, Black Iron Quantum AI (Private) Limited
               {" · "}
-              <a href="tel:+923225150501" className="transition-colors hover:text-[#f3c87a]">+92 322 5150501</a>
+              <a href="tel:+923225150501" className="font-semibold text-[#f3c87a] no-underline transition-colors hover:text-white">+92 322 5150501</a>
             </p>
           </div>
           <button
