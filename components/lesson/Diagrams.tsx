@@ -260,64 +260,129 @@ export function ThreeTestsDiagram() {
 export function CrossingDiagram() {
   const T = 8;
   const carTimes = [0, 0.5, 1];
+  const brake = { duration: T, times: carTimes, repeat: Infinity, ease: ["easeOut", "linear"] as ["easeOut", "linear"] };
+  const towers = [
+    [10, 52, 34], [48, 30, 40], [92, 62, 30], [128, 40, 44], [176, 70, 28], [210, 36, 38],
+    [560, 58, 36], [600, 34, 40], [520, 74, 26],
+  ];
   return (
-    <Figure vb="0 0 640 270" caption="You can see the car slowing. The driver's intention to stop is what you actually act on, and it is invisible.">
-      <rect x="0" y="0" width="640" height="112" rx="18" fill="#eaf4f7" />
-      <rect x="0" y="112" width="640" height="20" fill="#d9d2c3" />
-      <rect x="0" y="132" width="640" height="100" fill="#4a4741" />
-      <rect x="0" y="232" width="640" height="38" rx="18" fill="#d9d2c3" />
+    <Figure vb="0 0 640 280" caption="You can see the car slowing. The driver's intention to stop is what you actually act on, and it is invisible.">
+      <defs>
+        <linearGradient id="cx-sky" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#2b5a6b" />
+          <stop offset="0.55" stopColor="#e8c79a" />
+          <stop offset="1" stopColor="#f6dfb4" />
+        </linearGradient>
+        <radialGradient id="cx-sun" cx="0.5" cy="0.5" r="0.5">
+          <stop offset="0" stopColor="#fff3c9" stopOpacity="0.95" />
+          <stop offset="1" stopColor="#fff3c9" stopOpacity="0" />
+        </radialGradient>
+        <linearGradient id="cx-road" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#57534b" />
+          <stop offset="1" stopColor="#35322d" />
+        </linearGradient>
+        <linearGradient id="cx-body" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#e0a548" />
+          <stop offset="1" stopColor="#a8701c" />
+        </linearGradient>
+        <linearGradient id="cx-beam" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0" stopColor="#fff3c9" stopOpacity="0.75" />
+          <stop offset="1" stopColor="#fff3c9" stopOpacity="0" />
+        </linearGradient>
+        <radialGradient id="cx-red" cx="0.5" cy="0.5" r="0.5">
+          <stop offset="0" stopColor="#ff5a4a" stopOpacity="0.9" />
+          <stop offset="1" stopColor="#ff5a4a" stopOpacity="0" />
+        </radialGradient>
+      </defs>
+
+      {/* dusk sky, sun, skyline */}
+      <rect x="0" y="0" width="640" height="118" rx="18" fill="url(#cx-sky)" />
+      <motion.circle cx="330" cy="100" r="90" fill="url(#cx-sun)"
+        animate={{ opacity: [0.7, 1, 0.7] }} transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }} />
+      {towers.map(([x, h, w], i) => (
+        <g key={i}>
+          <rect x={x} y={118 - h} width={w} height={h} fill="#1f4350" opacity="0.85" />
+          {[0, 1, 2].map((r) => (
+            <motion.rect key={r} x={x + 6 + (r % 2) * 14} y={118 - h + 8 + r * 12} width="6" height="5" rx="1" fill="#ffe29a"
+              animate={{ opacity: [0.2, 0.95, 0.2] }}
+              transition={{ duration: 3 + ((i + r) % 3), delay: (i * 0.7 + r * 0.4) % 3, repeat: Infinity }} />
+          ))}
+        </g>
+      ))}
+
+      {/* pavement, road, kerb */}
+      <rect x="0" y="118" width="640" height="16" fill="#cfc6b4" />
+      <rect x="0" y="134" width="640" height="106" fill="url(#cx-road)" />
+      <rect x="0" y="134" width="640" height="3" fill="#e9e1cf" opacity="0.6" />
+      <rect x="0" y="240" width="640" height="40" rx="18" fill="#cfc6b4" />
       {[0, 1, 2, 3, 4, 5, 6, 7].map((i) => (
-        <rect key={i} x={20 + i * 85} y="180" width="42" height="5" rx="2" fill="#f4efe4" opacity="0.7" />
+        <rect key={i} x={20 + i * 85} y="188" width="42" height="5" rx="2" fill="#f4efe4" opacity="0.6" />
       ))}
       {[0, 1, 2, 3, 4].map((i) => (
-        <rect key={i} x="440" y={136 + i * 19} width="70" height="11" fill="#f4efe4" opacity="0.85" />
+        <rect key={i} x="438" y={140 + i * 19} width="74" height="11" fill="#f6f1e6" opacity="0.9" />
       ))}
-      <text x="475" y="105" textAnchor="middle" fontSize="11" fontWeight="800" letterSpacing="2" fill={MUTED}>CROSSING</text>
 
-      {/* pedestrian steps off the kerb */}
+      {/* pedestrian */}
       <motion.g
-        animate={{ y: [0, 0, 36, 36, 0], opacity: [1, 1, 1, 1, 0] }}
-        transition={{ duration: T, times: [0, 0.55, 0.68, 0.95, 1], repeat: Infinity, ease: "easeInOut" }}
+        animate={{ y: [0, 0, 40, 40, 0], opacity: [1, 1, 1, 1, 0] }}
+        transition={{ duration: T, times: [0, 0.55, 0.7, 0.95, 1], repeat: Infinity, ease: "easeInOut" }}
       >
-        <circle cx="475" cy="78" r="8" fill={INK} />
-        <line x1="475" y1="86" x2="475" y2="108" stroke={INK} strokeWidth="5" strokeLinecap="round" />
-        <line x1="475" y1="108" x2="469" y2="124" stroke={INK} strokeWidth="4" strokeLinecap="round" />
-        <line x1="475" y1="108" x2="481" y2="124" stroke={INK} strokeWidth="4" strokeLinecap="round" />
+        <ellipse cx="475" cy="130" rx="14" ry="3" fill="#000" opacity="0.25" />
+        <circle cx="475" cy="84" r="9" fill={INK} />
+        <path d="M475 93 L475 114" stroke={INK} strokeWidth="6" strokeLinecap="round" />
+        <path d="M475 114 L469 130 M475 114 L481 130" stroke={INK} strokeWidth="4.5" strokeLinecap="round" />
+        <path d="M475 98 L466 108 M475 98 L484 108" stroke={INK} strokeWidth="3.5" strokeLinecap="round" />
+        <motion.circle cx="475" cy="84" r="13" fill="none" stroke={TEAL_L} strokeWidth="2"
+          animate={{ r: [10, 22], opacity: [0.8, 0] }} transition={{ duration: 2, repeat: Infinity, ease: "easeOut" }} />
       </motion.g>
 
-      {/* the car decelerates to a stop before the crossing */}
-      <motion.g
-        initial={{ x: -170 }}
-        animate={{ x: [-170, 190, 190] }}
-        transition={{ duration: T, times: carTimes, repeat: Infinity, ease: ["easeOut", "linear"] }}
-      >
-        <rect x="40" y="152" width="120" height="38" rx="12" fill={AMBER} />
-        <path d="M62 152 L78 130 H128 L144 152 Z" fill={AMBER_L} />
-        <rect x="84" y="136" width="18" height="14" rx="3" fill="#eaf4f7" />
-        <rect x="108" y="136" width="18" height="14" rx="3" fill="#eaf4f7" />
-        <circle cx="68" cy="192" r="11" fill={INK} />
-        <circle cx="132" cy="192" r="11" fill={INK} />
-        {/* the hidden thing: an intention inside the driver */}
-        <motion.g
-          animate={{ opacity: [0, 0, 1, 1, 0] }}
-          transition={{ duration: T, times: [0, 0.3, 0.45, 0.95, 1], repeat: Infinity }}
-        >
-          <ellipse cx="100" cy="98" rx="66" ry="22" fill="#2b5a6b" stroke={TEAL_L} strokeWidth="2" strokeDasharray="5 5" />
-          <circle cx="96" cy="124" r="4" fill={TEAL} />
-          <circle cx="92" cy="114" r="6" fill={TEAL} />
-          <text x="100" y="103" textAnchor="middle" fontSize="13" fontWeight="600" fill="#fff">“I'll stop”</text>
+      {/* the car */}
+      <motion.g initial={{ x: -190 }} animate={{ x: [-190, 190, 190] }} transition={brake}>
+        <motion.g animate={{ opacity: [1, 0, 0] }} transition={brake}>
+          {[0, 1, 2].map((i) => (
+            <rect key={i} x={-30 - i * 6} y={158 + i * 14} width={60 + i * 10} height="3" rx="1.5" fill="#fff" opacity="0.5" />
+          ))}
+        </motion.g>
+        <polygon points="158,172 330,140 330,214 158,184" fill="url(#cx-beam)" />
+        <ellipse cx="100" cy="206" rx="64" ry="5" fill="#000" opacity="0.3" />
+        <rect x="40" y="158" width="120" height="40" rx="13" fill="url(#cx-body)" />
+        <path d="M62 158 L78 134 H128 L146 158 Z" fill="#f3c87a" />
+        <rect x="84" y="140" width="18" height="15" rx="3" fill="#dff0f5" />
+        <rect x="108" y="140" width="20" height="15" rx="3" fill="#dff0f5" />
+        <circle cx="94" cy="148" r="4" fill={INK} />
+        <circle cx="158" cy="172" r="4" fill="#fff3c9" />
+        <circle cx="42" cy="170" r="14" fill="url(#cx-red)" />
+        <motion.circle cx="42" cy="170" r="12" fill="url(#cx-red)"
+          animate={{ opacity: [0, 1, 1] }} transition={{ ...brake, times: [0, 0.2, 1] }} />
+        <rect x="40" y="166" width="5" height="9" rx="2" fill="#ff5a4a" />
+        {[68, 134].map((cx) => (
+          <g key={cx}>
+            <circle cx={cx} cy="198" r="12" fill={INK} />
+            <motion.g style={{ transformOrigin: `${cx}px 198px` }} animate={{ rotate: [0, 900, 900] }} transition={brake}>
+              <circle cx={cx} cy="198" r="6" fill="#bdb6a8" />
+              <path d={`M${cx - 6} 198 H${cx + 6} M${cx} 192 V204`} stroke={INK} strokeWidth="2" />
+            </motion.g>
+          </g>
+        ))}
+        <motion.g animate={{ opacity: [0, 0, 1, 1, 0] }} transition={{ duration: T, times: [0, 0.3, 0.45, 0.95, 1], repeat: Infinity }}>
+          <circle cx="94" cy="128" r="3.5" fill={TEAL} />
+          <circle cx="86" cy="117" r="5.5" fill={TEAL} />
+          <motion.ellipse cx="100" cy="88" rx="68" ry="23" fill={TEAL} stroke={TEAL_L} strokeWidth="2" strokeDasharray="5 5"
+            animate={{ ry: [23, 25, 23] }} transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }} />
+          <text x="100" y="93" textAnchor="middle" fontSize="14" fontWeight="600" fill="#fff">“I'll stop”</text>
         </motion.g>
       </motion.g>
 
-      {/* what you can see: a falling speed */}
-      <text x="20" y="254" fontSize="11" fontWeight="800" letterSpacing="2" fill={AMBER}>SEEN · SPEED</text>
-      <rect x="130" y="245" width="140" height="10" rx="5" fill="#fff" opacity="0.6" />
-      <motion.rect
-        x="130" y="245" height="10" rx="5" fill={AMBER}
-        animate={{ width: [140, 6, 6] }}
-        transition={{ duration: T, times: carTimes, repeat: Infinity, ease: ["easeOut", "linear"] }}
-      />
-      <text x="620" y="254" textAnchor="end" fontSize="11" fontWeight="800" letterSpacing="2" fill={TEAL}>UNSEEN · THE DRIVER'S INTENTION</text>
+      {/* trust: pedestrian to the hidden intention */}
+      <motion.path d="M468 80 C430 40 380 52 360 86" fill="none" stroke={TEAL} strokeWidth="2.5" strokeDasharray="2 8" strokeLinecap="round"
+        animate={{ pathLength: [0, 0, 1, 1, 0], opacity: [0, 0, 1, 1, 0] }}
+        transition={{ duration: T, times: [0, 0.4, 0.55, 0.95, 1], repeat: Infinity, ease: "easeInOut" }} />
+
+      {/* readouts */}
+      <text x="20" y="262" fontSize="11" fontWeight="800" letterSpacing="2" fill={AMBER}>SEEN · SPEED</text>
+      <rect x="128" y="253" width="150" height="10" rx="5" fill="#fff" opacity="0.7" />
+      <motion.rect x="128" y="253" height="10" rx="5" fill={AMBER} animate={{ width: [150, 6, 6] }} transition={brake} />
+      <text x="620" y="262" textAnchor="end" fontSize="11" fontWeight="800" letterSpacing="2" fill={TEAL}>UNSEEN · THE DRIVER'S INTENTION</text>
     </Figure>
   );
 }
