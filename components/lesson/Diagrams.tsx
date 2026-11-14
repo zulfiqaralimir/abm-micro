@@ -700,62 +700,73 @@ export function ExamDiagram() {
   const wood = "#b98a5a";
 
   const student = (cx: number, o: { skin: string; skinD: string; hair: string; shirt: string; long: boolean; tired: boolean; delay: number; pen: boolean }) => {
-    const hand = (side: 1 | -1) => {
-      const hx = cx + side * 12;
-      return `M${cx + side * 24} 176 Q${cx + side * 33} 192 ${cx + side * 27} 201 L${hx} 206`;
-    };
+    const arm = (side: 1 | -1) => `M${cx + side * 15} 177 Q${cx + side * 21} 188 ${cx + side * 19} 196 L${cx + side * 10} 203`;
     return (
       <g>
         {/* chair back */}
-        <rect x={cx - 31} y="158" width="62" height="52" rx="9" fill="#5e4029" />
-        <rect x={cx - 31} y="158" width="62" height="4" rx="2" fill="#8f6742" />
+        <rect x={cx - 26} y="160" width="52" height="50" rx="8" fill="#5e4029" />
+        <rect x={cx - 26} y="160" width="52" height="3.5" rx="2" fill="#8f6742" />
         <g>
-          <animateTransform attributeName="transform" type="translate" values="0 0;0 -1.1;0 0" dur="3.6s" begin={`${o.delay}s`} repeatCount="indefinite" />
-          <path d={`M${cx - 28} 208 Q${cx - 31} 178 ${cx - 15} 172 L${cx + 15} 172 Q${cx + 31} 178 ${cx + 28} 208 Z`} fill={o.shirt} />
-          <path d={`M${cx - 28} 208 Q${cx - 31} 178 ${cx - 15} 172 L${cx - 12} 208 Z`} fill="#000" opacity="0.14" />
-          <path d={`M${cx - 6} 172 Q${cx} 178 ${cx + 6} 172`} stroke="#000" strokeWidth="1" opacity="0.25" fill="none" />
-          {/* arms resting on the desk; the right hand moves with the pen */}
-          <path d={hand(-1)} stroke={o.shirt} strokeWidth="8.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
-          <circle cx={cx - 11} cy="206" r="3.2" fill={o.skin} />
-          <path stroke={o.shirt} strokeWidth="8.5" strokeLinecap="round" strokeLinejoin="round" fill="none" d={hand(1)}>
-          </path>
+          <animateTransform attributeName="transform" type="translate" values="0 0;0 -0.9;0 0" dur="3.6s" begin={`${o.delay}s`} repeatCount="indefinite" />
+          {/* torso with collar and soft shading */}
+          <path d={`M${cx - 19} 204 Q${cx - 21.5} 183 ${cx - 13} 176 Q${cx - 8} 173 ${cx} 173 Q${cx + 8} 173 ${cx + 13} 176 Q${cx + 21.5} 183 ${cx + 19} 204 Z`} fill={o.shirt} />
+          <path d={`M${cx - 19} 204 Q${cx - 21.5} 183 ${cx - 13} 176 L${cx - 9} 204 Z`} fill="#000" opacity="0.15" />
+          {o.long ? (
+            <path d={`M${cx - 6.5} 173 L${cx} 183 L${cx + 6.5} 173 Q${cx} 177 ${cx - 6.5} 173 Z`} fill="#f3ecdd" />
+          ) : (
+            <path d={`M${cx - 6.8} 173.4 Q${cx} 181 ${cx + 6.8} 173.4`} stroke="#000" strokeWidth="1.6" opacity="0.28" fill="none" />
+          )}
+          {/* arms resting on the desk */}
+          <path d={arm(-1)} stroke={o.shirt} strokeWidth="6.8" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+          <ellipse cx={cx - 9.5} cy="203.5" rx="3.2" ry="2.5" fill={o.skin} />
+          <path d={arm(1)} stroke={o.shirt} strokeWidth="6.8" strokeLinecap="round" strokeLinejoin="round" fill="none" />
           <g>
-            <circle cx={cx + 12} cy="206" r="3.2" fill={o.skin} />
-            <line x1={cx + 12} y1="206" x2={cx + 20} y2="198" stroke="#2a2f3a" strokeWidth="1.6" strokeLinecap="round" />
-            <animateTransform attributeName="transform" type="translate" values="0 0;-3 1;0 0" dur={o.pen ? "0.7s" : "3.2s"} begin={`${o.delay}s`} repeatCount="indefinite" />
+            <ellipse cx={cx + 9.5} cy="203.5" rx="3.2" ry="2.5" fill={o.skin} />
+            <line x1={cx + 10} y1="203" x2={cx + 17} y2="196" stroke="#2a2f3a" strokeWidth="1.5" strokeLinecap="round" />
+            <animateTransform attributeName="transform" type="translate" values="0 0;-2.6 0.8;0 0" dur={o.pen ? "0.7s" : "3.2s"} begin={`${o.delay}s`} repeatCount="indefinite" />
           </g>
           {/* head: tilts gently, eyes drift between paper and teacher */}
           <g>
-            <animateTransform attributeName="transform" type="rotate" values={`-1.6 ${cx} 170;1.8 ${cx} 170;-1.6 ${cx} 170`} dur={o.tired ? "4.4s" : "6.2s"} begin={`${o.delay}s`} repeatCount="indefinite" />
-            <rect x={cx - 4.2} y="160" width="8.4" height="13" rx="3" fill={o.skinD} />
-            <circle cx={cx - 12.2} cy="151.5" r="2.5" fill={o.skinD} />
-            <circle cx={cx + 12.2} cy="151.5" r="2.5" fill={o.skinD} />
-            <ellipse cx={cx} cy="150" rx="12" ry="13.4" fill={o.skin} />
-            <ellipse cx={cx - 4} cy="146" rx="5" ry="6" fill="#fff" opacity="0.08" />
+            <animateTransform attributeName="transform" type="rotate" values={`-1.6 ${cx} 172;1.8 ${cx} 172;-1.6 ${cx} 172`} dur={o.tired ? "4.4s" : "6.2s"} begin={`${o.delay}s`} repeatCount="indefinite" />
+            <path d={`M${cx - 3.6} 163 L${cx - 3.6} 174 Q${cx} 177 ${cx + 3.6} 174 L${cx + 3.6} 163 Z`} fill={o.skinD} />
+            <circle cx={cx - 8.9} cy="153.4" r="1.9" fill={o.skinD} />
+            <circle cx={cx + 8.9} cy="153.4" r="1.9" fill={o.skinD} />
+            <path d={`M${cx - 8.8} 152 Q${cx - 9.2} 142.5 ${cx} 142 Q${cx + 9.2} 142.5 ${cx + 8.8} 152 Q${cx + 8.8} 161 ${cx + 5} 164.5 Q${cx} 167.8 ${cx - 5} 164.5 Q${cx - 8.8} 161 ${cx - 8.8} 152 Z`} fill={o.skin} />
+            <path d={`M${cx + 2} 143 Q${cx + 9.2} 144 ${cx + 8.8} 152 Q${cx + 8.8} 161 ${cx + 5} 164.5 Q${cx + 7} 156 ${cx + 2} 143 Z`} fill="#000" opacity="0.07" />
+            {/* hair */}
             {o.long ? (
-              <path d={`M${cx - 13} 150 Q${cx - 15.5} 131 ${cx} 132.5 Q${cx + 15.5} 131 ${cx + 13} 150 L${cx + 15} 176 Q${cx + 10.5} 170 ${cx + 10.5} 150 Q${cx} 140 ${cx - 10.5} 150 Q${cx - 10.5} 170 ${cx - 15} 176 Z`} fill={o.hair} />
+              <g>
+                <path d={`M${cx - 9.8} 152 Q${cx - 11.2} 138.6 ${cx} 139 Q${cx + 11.2} 138.6 ${cx + 9.8} 152 Q${cx + 6.5} 145 ${cx} 145.2 Q${cx - 6.5} 145 ${cx - 9.8} 152 Z`} fill={o.hair} />
+                <path d={`M${cx - 9.8} 150 Q${cx - 12.8} 166 ${cx - 11.8} 181 L${cx - 7.6} 181 Q${cx - 8.8} 166 ${cx - 8.4} 153 Z`} fill={o.hair} />
+                <path d={`M${cx + 9.8} 150 Q${cx + 12.8} 166 ${cx + 11.8} 181 L${cx + 7.6} 181 Q${cx + 8.8} 166 ${cx + 8.4} 153 Z`} fill={o.hair} />
+                <path d={`M${cx - 4} 142 Q${cx} 140.6 ${cx + 4.4} 142.2`} stroke="#fff" strokeWidth="1" opacity="0.2" fill="none" strokeLinecap="round" />
+              </g>
             ) : (
-              <path d={`M${cx - 12.6} 148 Q${cx - 14} 133 ${cx} 134 Q${cx + 14} 133 ${cx + 12.6} 148 Q${cx + 8} 140.5 ${cx} 141.5 Q${cx - 8} 140.5 ${cx - 12.6} 148 Z`} fill={o.hair} />
+              <g>
+                <path d={`M${cx - 9.6} 150 Q${cx - 10.8} 138.6 ${cx} 139.4 Q${cx + 10.8} 138.6 ${cx + 9.6} 150 Q${cx + 6.4} 144.4 ${cx + 1.4} 145.4 Q${cx - 4.2} 143.6 ${cx - 9.6} 150 Z`} fill={o.hair} />
+                <path d={`M${cx - 6} 141 L${cx - 7} 137.8 M${cx - 1} 139.6 L${cx - 1.4} 136.4 M${cx + 4} 140 L${cx + 5.4} 137`} stroke={o.hair} strokeWidth="1.5" strokeLinecap="round" />
+                <path d={`M${cx - 4} 141.6 Q${cx + 1} 140.4 ${cx + 5} 142`} stroke="#fff" strokeWidth="0.9" opacity="0.14" fill="none" strokeLinecap="round" />
+              </g>
             )}
-            <path d={`M${cx - 6} 137 Q${cx} 134.5 ${cx + 5} 137`} stroke="#fff" strokeWidth="1.3" opacity="0.18" fill="none" strokeLinecap="round" />
-            {/* brows, eyes, nose, mouth */}
+            {/* brows, eyes, nose, mouth, cheeks */}
             {[-1, 1].map((sd) => (
-              <path key={sd} d={o.tired ? `M${cx + sd * 7.6} ${146.4 - sd * 0.6} Q${cx + sd * 4.6} 145.4 ${cx + sd * 2.4} ${146.6 + sd * 0.4}` : `M${cx + sd * 7.4} 146.2 Q${cx + sd * 4.6} 144.6 ${cx + sd * 2.4} 146`} stroke={o.hair} strokeWidth="1.1" fill="none" strokeLinecap="round" />
+              <path key={sd} d={o.tired ? `M${cx + sd * 6.2} ${150.7 - sd * 0.4} Q${cx + sd * 4} 149.8 ${cx + sd * 1.9} ${151 + sd * 0.3}` : `M${cx + sd * 6.1} 150.6 Q${cx + sd * 4} 149.2 ${cx + sd * 1.9} 150.4`} stroke={o.hair} strokeWidth="1" fill="none" strokeLinecap="round" />
             ))}
-            {[-4.8, 4.8].map((dx) => (
+            {[-3.9, 3.9].map((dx) => (
               <g key={dx}>
-                <ellipse cx={cx + dx} cy="151" rx="2.3" ry="1.7" fill="#fff" />
-                <ellipse cx={cx + dx} cy="151" rx="1.15" ry="1.15" fill="#2a1d16">
-                  <animate attributeName="cx" values={`${cx + dx};${cx + dx - 0.9};${cx + dx - 0.9};${cx + dx}`} keyTimes="0;0.4;0.7;1" dur="6s" begin={`${o.delay}s`} repeatCount="indefinite" />
-                  <animate attributeName="ry" values="1.15;1.15;0.12;1.15;1.15" keyTimes="0;0.9;0.94;0.98;1" dur="4.2s" begin={`${o.delay}s`} repeatCount="indefinite" />
+                <ellipse cx={cx + dx} cy="153.6" rx="2" ry="1.35" fill="#fff" />
+                <ellipse cx={cx + dx} cy="153.6" rx="1" ry="1" fill="#2a1d16">
+                  <animate attributeName="cx" values={`${cx + dx};${cx + dx - 0.8};${cx + dx - 0.8};${cx + dx}`} keyTimes="0;0.4;0.7;1" dur="6s" begin={`${o.delay}s`} repeatCount="indefinite" />
+                  <animate attributeName="ry" values="1;1;0.1;1;1" keyTimes="0;0.9;0.94;0.98;1" dur="4.2s" begin={`${o.delay}s`} repeatCount="indefinite" />
                 </ellipse>
+                <path d={`M${cx + dx - 2.1} 152.7 Q${cx + dx} 151.8 ${cx + dx + 2.1} 152.7`} stroke="#3b2e29" strokeWidth="0.7" fill="none" />
+                {o.tired && <path d={`M${cx + dx - 2.2} 155.4 Q${cx + dx} 156.7 ${cx + dx + 2.2} 155.4`} stroke="#8f5f3e" strokeWidth="0.8" fill="none" opacity="0.7" />}
               </g>
             ))}
-            {o.tired && [-4.8, 4.8].map((dx) => (
-              <path key={dx} d={`M${cx + dx - 2.6} 154.4 Q${cx + dx} 156.6 ${cx + dx + 2.6} 154.4`} stroke="#9a6a45" strokeWidth="0.9" fill="none" opacity="0.8" />
-            ))}
-            <path d={`M${cx} 151.5 Q${cx - 1.8} 156 ${cx + 0.6} 156.4`} stroke="#9a6a45" strokeWidth="0.9" fill="none" strokeLinecap="round" />
-            <path d={o.tired ? `M${cx - 3.6} 159.6 Q${cx} 160.2 ${cx + 3.6} 159.4` : `M${cx - 4.2} 158.6 Q${cx} 162.2 ${cx + 4.2} 158.6`} stroke="#8a4b3a" strokeWidth="1.1" fill="none" strokeLinecap="round" />
+            <path d={`M${cx} 154.6 Q${cx - 1.4} 158.2 ${cx + 0.6} 158.8`} stroke="#9a6a45" strokeWidth="0.8" fill="none" strokeLinecap="round" />
+            <ellipse cx={cx - 5.6} cy="158.6" rx="2" ry="1.2" fill="#d9776a" opacity="0.2" />
+            <ellipse cx={cx + 5.6} cy="158.6" rx="2" ry="1.2" fill="#d9776a" opacity="0.2" />
+            <path d={o.tired ? `M${cx - 2.8} 162.2 Q${cx} 162.7 ${cx + 2.8} 162.1` : `M${cx - 3.2} 161.6 Q${cx} 164 ${cx + 3.2} 161.6 Q${cx} 162.6 ${cx - 3.2} 161.6 Z`} stroke="#a8453f" strokeWidth="1" fill={o.tired ? "none" : "#a8453f"} strokeLinecap="round" strokeLinejoin="round" />
           </g>
         </g>
         {/* desk: lit top, wooden front, soft shadow */}
@@ -879,13 +890,14 @@ export function ExamDiagram() {
         ))}
         <ellipse cx="92.5" cy="172.5" rx="3.2" ry="2.6" fill="#d9a679" />
         {/* right arm raised: red pen marks in the air */}
+        <path d="M116 125 Q125.5 140 128 150" stroke="#7a3b52" strokeWidth="7.6" strokeLinecap="round" strokeLinejoin="round" fill="none" />
         <g>
-          <path d="M116 125 Q125.5 140 128 150 Q131 150 134 142" stroke="#7a3b52" strokeWidth="7.6" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+          <path d="M128 150 Q131 150 134 142" stroke="#7a3b52" strokeWidth="7.6" strokeLinecap="round" strokeLinejoin="round" fill="none" />
           <ellipse cx="135.5" cy="138.5" rx="3.3" ry="3.8" fill="#d9a679" />
           <path d="M133 136.5 Q131.8 134.5 133.2 133.6" stroke="#d9a679" strokeWidth="1.6" strokeLinecap="round" fill="none" />
           <line x1="136" y1="139" x2="144.5" y2="124" stroke="#c0392b" strokeWidth="2.1" strokeLinecap="round" />
           <line x1="143.4" y1="126" x2="144.5" y2="124" stroke="#2a2f3a" strokeWidth="2.1" strokeLinecap="round" />
-          <animateTransform attributeName="transform" type="translate" values="0 0;3 -2.5;-1 1;0 0" dur="2.6s" repeatCount="indefinite" />
+          <animateTransform attributeName="transform" type="rotate" values="0 128 150;-16 128 150;7 128 150;0 128 150" dur="2.6s" repeatCount="indefinite" />
         </g>
         {/* head: turns between the two papers */}
         <g>
