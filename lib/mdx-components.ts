@@ -9,7 +9,7 @@ import {
   Strong, TBody, TD, TH, THead, TR, Table, UL,
 } from "@/components/lesson/Elements";
 import {
-  CriteriaDiagram, CrossingDiagram, MapDiagram, ModelsABDiagram, SeenUnseenDiagram, ThreeTestsDiagram,
+  CriteriaDiagram, CrossingDiagram, ExamDiagram, MapDiagram, ModelsABDiagram, SeenUnseenDiagram, ThreeTestsDiagram,
 } from "@/components/lesson/Diagrams";
 
 // Components exposed to chapter MDX bodies (CLAUDE.md §4 template), plus the
@@ -45,6 +45,7 @@ export const chapterMdxComponents = {
   Reference,
   SeenUnseenDiagram,
   CrossingDiagram,
+  ExamDiagram,
   MapDiagram,
   ModelsABDiagram,
   CriteriaDiagram,

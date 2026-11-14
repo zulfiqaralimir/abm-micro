@@ -680,3 +680,222 @@ export function CrossingDiagram() {
     </Figure>
   );
 }
+
+/* 0b — the exam: the same grade, two very different minds behind it */
+export function ExamDiagram() {
+  const T = 9;
+  const tl = (times: number[], values: number[]) => ({
+    animate: { opacity: values },
+    transition: { duration: T, times, repeat: Infinity, ease: "linear" as const },
+  });
+  const grade = tl([0, 0.1, 0.14, 0.95, 0.98, 1], [0, 0, 1, 1, 0, 0]);
+  const same = tl([0, 0.18, 0.23, 0.95, 0.98, 1], [0, 0, 1, 1, 0, 0]);
+  const asking = tl([0, 0.3, 0.36, 0.95, 0.98, 1], [0, 0, 1, 1, 0, 0]);
+  const unknown = tl([0, 0.28, 0.34, 0.46, 0.52, 1], [0, 0, 1, 1, 0, 0]);
+  const mind = tl([0, 0.46, 0.56, 0.95, 0.98, 1], [0, 0, 1, 1, 0, 0]);
+  const trace = {
+    animate: { pathLength: [0, 0, 1, 1, 0, 0], opacity: [0, 0, 1, 1, 0, 0] },
+    transition: { duration: T, times: [0, 0.32, 0.46, 0.95, 0.98, 1], repeat: Infinity, ease: "linear" as const },
+  };
+  const wood = "#b98a5a";
+
+  const student = (cx: number, o: { skin: string; hair: string; shirt: string; long: boolean; tired: boolean; delay: number }) => (
+    <g>
+      <g>
+        <animateTransform attributeName="transform" type="translate" values="0 0;0 -1.2;0 0" dur="3.4s" begin={`${o.delay}s`} repeatCount="indefinite" />
+        <path d={`M${cx - 26} 206 Q${cx - 28} 176 ${cx - 14} 170 L${cx + 14} 170 Q${cx + 28} 176 ${cx + 26} 206 Z`} fill={o.shirt} />
+        <path d={`M${cx - 26} 206 Q${cx - 28} 176 ${cx - 14} 170 L${cx - 14} 206 Z`} fill="#000" opacity="0.12" />
+        <rect x={cx - 4} y="160" width="8" height="12" fill={o.skin} />
+        <circle cx={cx} cy="150" r="12.5" fill={o.skin} />
+        {o.long ? (
+          <path d={`M${cx - 13.5} 150 Q${cx - 15} 132 ${cx} 133 Q${cx + 15} 132 ${cx + 13.5} 150 L${cx + 15} 174 Q${cx + 10} 168 ${cx + 10} 150 Q${cx} 141 ${cx - 10} 150 Q${cx - 10} 168 ${cx - 15} 174 Z`} fill={o.hair} />
+        ) : (
+          <path d={`M${cx - 13} 148 Q${cx - 14} 133 ${cx} 134 Q${cx + 14} 133 ${cx + 13} 148 Q${cx + 8} 140 ${cx} 141 Q${cx - 8} 140 ${cx - 13} 148 Z`} fill={o.hair} />
+        )}
+        {[-4.6, 4.6].map((dx) => (
+          <ellipse key={dx} cx={cx + dx} cy="151" rx="1.5" ry="1.5" fill="#15110e">
+            <animate attributeName="ry" values="1.5;1.5;0.15;1.5;1.5" keyTimes="0;0.9;0.94;0.98;1" dur="4.2s" begin={`${o.delay}s`} repeatCount="indefinite" />
+          </ellipse>
+        ))}
+        {o.tired && [-4.6, 4.6].map((dx) => (
+          <path key={dx} d={`M${cx + dx - 2.4} 154.5 Q${cx + dx} 156.5 ${cx + dx + 2.4} 154.5`} stroke="#b07a4f" strokeWidth="0.9" fill="none" />
+        ))}
+        <path d={o.tired ? `M${cx - 3.4} 158.2 Q${cx} 158.8 ${cx + 3.4} 158.2` : `M${cx - 4} 157 Q${cx} 161 ${cx + 4} 157`} stroke="#8a4b3a" strokeWidth="1.1" fill="none" strokeLinecap="round" />
+      </g>
+      {/* desk: lit top, wooden front */}
+      <rect x={cx - 66} y="196" width="132" height="20" rx="3" fill={wood} />
+      <rect x={cx - 66} y="196" width="132" height="3" fill="#e0bd8c" />
+      <rect x={cx - 66} y="216" width="132" height="28" fill="url(#ex-wood)" />
+      <rect x={cx - 66} y="216" width="132" height="2" fill="#000" opacity="0.25" />
+      {/* the exam paper with its grade */}
+      <polygon points={`${cx - 34},212 ${cx + 34},212 ${cx + 28},199 ${cx - 28},199`} fill="#fbf8f0" stroke="#d9d0bd" strokeWidth="0.8" />
+      {[0, 1, 2].map((k) => (
+        <line key={k} x1={cx - 24 + k * 1.5} y1={202 + k * 3.4} x2={cx + 4 - k * 2} y2={202 + k * 3.4} stroke="#a9a193" strokeWidth="0.9" />
+      ))}
+      <motion.g {...grade}>
+        <circle cx={cx + 15} cy="206" r="6.8" fill="none" stroke="#c0392b" strokeWidth="1.6" />
+        <text x={cx + 15} y="209.6" textAnchor="middle" fontSize="9.5" fontWeight="800" fill="#c0392b">B+</text>
+      </motion.g>
+    </g>
+  );
+
+  const A = 280, B = 480;
+  const nodes: [number, number][] = [[-50, 10], [-24, -14], [-2, -24], [6, 8], [32, -12], [52, 10]];
+  const links: [number, number][] = [[0, 1], [1, 2], [1, 3], [2, 4], [3, 4], [3, 5], [4, 5], [0, 3]];
+  const cards: [number, number, number][] = [[-52, -8, -14], [-28, 8, 9], [-4, -14, -6], [18, 6, 12], [-36, 20, 4]];
+
+  return (
+    <Figure vb="0 0 640 280" caption="The grade is only a trace of what was learned. Two students can leave the same mark behind very different minds.">
+      <defs>
+        <linearGradient id="ex-wall" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#f6ead2" />
+          <stop offset="1" stopColor="#e9d4ad" />
+        </linearGradient>
+        <linearGradient id="ex-floor" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#c89c68" />
+          <stop offset="1" stopColor="#8a6240" />
+        </linearGradient>
+        <linearGradient id="ex-wood" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#8f6742" />
+          <stop offset="1" stopColor="#5e4029" />
+        </linearGradient>
+        <linearGradient id="ex-ray" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#fff3c9" stopOpacity="0.55" />
+          <stop offset="1" stopColor="#fff3c9" stopOpacity="0" />
+        </linearGradient>
+      </defs>
+
+      {/* classroom */}
+      <rect x="0" y="0" width="640" height="176" rx="18" fill="url(#ex-wall)" />
+      <rect x="0" y="170" width="640" height="110" rx="18" fill="url(#ex-floor)" />
+      <rect x="0" y="170" width="640" height="4" fill="#6e4b2f" opacity="0.5" />
+      {[0, 1, 2, 3, 4, 5].map((k) => (
+        <line key={k} x1="0" y1={186 + k * 18} x2="640" y2={186 + k * 18} stroke="#6e4b2f" strokeWidth="0.8" opacity="0.25" />
+      ))}
+      {/* window and sunlight */}
+      <rect x="566" y="48" width="58" height="84" rx="4" fill="#cfe6ee" stroke="#e9dcc2" strokeWidth="4" />
+      <line x1="595" y1="48" x2="595" y2="132" stroke="#e9dcc2" strokeWidth="3" />
+      <line x1="566" y1="90" x2="624" y2="90" stroke="#e9dcc2" strokeWidth="3" />
+      <polygon points="566,132 624,132 470,260 360,260" fill="url(#ex-ray)" />
+      {/* board with chalk marks */}
+      <rect x="168" y="48" width="104" height="52" rx="3" fill="#2f4a3f" stroke="#8b6a43" strokeWidth="3" opacity="0.0" />
+
+      {/* step labels */}
+      {[
+        { x: 118, label: "1 · THE SAME GRADE", t: [0, 0.06, 0.28, 0.33] },
+        { x: 320, label: "2 · ONLY A TRACE", t: [0.28, 0.36, 0.54, 0.6] },
+        { x: 522, label: "3 · TWO DIFFERENT MINDS", t: [0.54, 0.62, 0.95, 1] },
+      ].map((s) => (
+        <motion.g key={s.label} animate={{ opacity: [0.3, 1, 1, 0.3] }} transition={{ duration: T, times: s.t, repeat: Infinity }}>
+          <rect x={s.x - 98} y="10" width="196" height="22" rx="11" fill="#3a2a1a" opacity="0.62" />
+          <text x={s.x} y="25" textAnchor="middle" fontSize="10.5" fontWeight="800" letterSpacing="1.5" fill="#fff">{s.label}</text>
+        </motion.g>
+      ))}
+
+      {/* the teacher, marking */}
+      <g>
+        <animateTransform attributeName="transform" type="translate" values="0 0;0 -1;0 0" dur="3.8s" repeatCount="indefinite" />
+        <ellipse cx="100" cy="236" rx="30" ry="5" fill="#000" opacity="0.28" />
+        <path d="M90 190 V232 M110 190 V232" stroke="#2a2f3a" strokeWidth="9" strokeLinecap="round" />
+        <ellipse cx="88" cy="234" rx="8" ry="3.4" fill="#15110e" />
+        <ellipse cx="112" cy="234" rx="8" ry="3.4" fill="#15110e" />
+        <path d="M76 196 Q74 150 88 144 L112 144 Q126 150 124 196 Z" fill="#7a3b52" />
+        <path d="M94 144 L100 160 L106 144 Z" fill="#f3ecdd" />
+        <path d="M76 150 Q70 178 74 200" stroke="#7a3b52" strokeWidth="9" strokeLinecap="round" fill="none" />
+        <circle cx="74" cy="203" r="4" fill="#d9a679" />
+        <path d="M124 150 Q134 160 138 142" stroke="#7a3b52" strokeWidth="9" strokeLinecap="round" fill="none" />
+        <circle cx="139" cy="139" r="4" fill="#d9a679" />
+        <line x1="140" y1="136" x2="148" y2="122" stroke="#c0392b" strokeWidth="2.4" strokeLinecap="round" />
+        <rect x="96" y="132" width="8" height="12" fill="#d9a679" />
+        <circle cx="100" cy="122" r="12" fill="#d9a679" />
+        <path d="M87.5 121 Q86 105 100 106 Q114 105 112.5 121 Q108 112 100 112 Q92 112 87.5 121 Z" fill="#4a3a33" />
+        <circle cx="100" cy="103" r="6.5" fill="#4a3a33" />
+        {[-4.4, 4.4].map((dx) => (
+          <ellipse key={dx} cx={100 + dx} cy="123" rx="1.4" ry="1.4" fill="#15110e">
+            <animate attributeName="ry" values="1.4;1.4;0.15;1.4;1.4" keyTimes="0;0.88;0.92;0.96;1" dur="4.6s" repeatCount="indefinite" />
+          </ellipse>
+        ))}
+        <path d="M96 129 Q100 132 104 129" stroke="#8a4b3a" strokeWidth="1.1" fill="none" strokeLinecap="round" />
+      </g>
+      {/* the teacher's question */}
+      <motion.g {...asking}>
+        <circle cx="106" cy="86" r="3" fill={TEAL} />
+        <circle cx="112" cy="76" r="4.5" fill={TEAL} />
+        <ellipse cx="108" cy="52" rx="62" ry="22" fill={TEAL} stroke={TEAL_L} strokeWidth="2" strokeDasharray="5 5" />
+        <text x="108" y="49" textAnchor="middle" fontSize="12" fontWeight="600" fill="#fff">Same grade.</text>
+        <text x="108" y="63" textAnchor="middle" fontSize="12" fontWeight="600" fill="#fff">Same learning?</text>
+      </motion.g>
+
+      {/* hidden minds: unknown, then revealed */}
+      {[A, B].map((cx) => (
+        <motion.g key={cx} {...unknown}>
+          <rect x={cx - 78} y="44" width="156" height="72" rx="18" fill="#ffffff" opacity="0.45" stroke={MUTED} strokeWidth="2" strokeDasharray="6 6" />
+          <text x={cx} y="92" textAnchor="middle" fontSize="38" fontWeight="800" fill={MUTED} opacity="0.7">?</text>
+        </motion.g>
+      ))}
+
+      {/* student A: understood */}
+      {student(A, { skin: "#d9a679", hair: "#2a1d16", shirt: "#2b7a8a", long: true, tired: false, delay: 0 })}
+      {/* student B: crammed */}
+      {student(B, { skin: "#c8915f", hair: "#3a2a1f", shirt: "#6e7f45", long: false, tired: true, delay: 1.1 })}
+
+      {/* traces from each grade up to the mind behind it */}
+      {[A, B].map((cx, i) => (
+        <motion.path key={cx} d={`M${cx + 24} 196 C${cx + 74} 180 ${cx + 78} 142 ${cx + 62} 118`} fill="none"
+          stroke={i ? AMBER : TEAL} strokeWidth="2.5" strokeDasharray="2 8" strokeLinecap="round" {...trace} />
+      ))}
+
+      {/* "=" between the two grades */}
+      <motion.g {...same}>
+        <text x="380" y="214" textAnchor="middle" fontSize="34" fontWeight="800" fill="#c0392b">=</text>
+        <text x="380" y="234" textAnchor="middle" fontSize="10" fontWeight="800" letterSpacing="1.5" fill="#fff">SAME GRADE</text>
+      </motion.g>
+
+      {/* mind A: connected understanding */}
+      <motion.g {...mind}>
+        <rect x={A - 78} y="44" width="156" height="72" rx="18" fill="#e4f3f7" stroke={TEAL_L} strokeWidth="2" />
+        <g transform={`translate(${A} 80)`}>
+          {links.map(([a, b], k) => (
+            <line key={k} x1={nodes[a][0]} y1={nodes[a][1]} x2={nodes[b][0]} y2={nodes[b][1]} stroke={TEAL} strokeWidth="1.6" strokeDasharray="4 4" opacity="0.8">
+              <animate attributeName="stroke-dashoffset" values="0;-16" dur="1.6s" repeatCount="indefinite" />
+            </line>
+          ))}
+          {nodes.map(([x, y], k) => (
+            <g key={k}>
+              <circle cx={x} cy={y} r="8" fill={TEAL_L} opacity="0.35">
+                <animate attributeName="r" values="5;10;5" dur={`${2.2 + k * 0.25}s`} begin={`${k * 0.2}s`} repeatCount="indefinite" />
+                <animate attributeName="opacity" values="0.5;0;0.5" dur={`${2.2 + k * 0.25}s`} begin={`${k * 0.2}s`} repeatCount="indefinite" />
+              </circle>
+              <circle cx={x} cy={y} r="4.6" fill={TEAL} stroke="#fff" strokeWidth="1.2" />
+            </g>
+          ))}
+        </g>
+        <text x={A} y="130" textAnchor="middle" fontSize="10.5" fontWeight="800" letterSpacing="1.5" fill={TEAL}>UNDERSTOOD IT</text>
+      </motion.g>
+
+      {/* mind B: facts crammed at 2 a.m. */}
+      <motion.g {...mind}>
+        <rect x={B - 78} y="44" width="156" height="72" rx="18" fill="#fdf0d8" stroke={AMBER_L} strokeWidth="2" />
+        <g transform={`translate(${B - 4} 80)`}>
+          {cards.map(([x, y, r], k) => (
+            <g key={k} transform={`translate(${x} ${y}) rotate(${r})`}>
+              <animateTransform attributeName="transform" type="rotate" additive="sum" values={`0;${k % 2 ? 4 : -4};0`} dur={`${2.6 + k * 0.4}s`} repeatCount="indefinite" />
+              <rect x="-11" y="-7" width="22" height="14" rx="2" fill="#fff" stroke={AMBER} strokeWidth="1.1" />
+              <line x1="-7" y1="-2" x2="7" y2="-2" stroke="#c9b48c" strokeWidth="1" />
+              <line x1="-7" y1="2" x2="3" y2="2" stroke="#c9b48c" strokeWidth="1" />
+            </g>
+          ))}
+          <circle cx="50" cy="-12" r="9" fill="#f3c87a" />
+          <circle cx="54" cy="-15" r="8" fill="#fdf0d8" />
+          <text x="48" y="12" textAnchor="middle" fontSize="9" fontWeight="800" fill={AMBER}>2:00 AM</text>
+        </g>
+        <text x={B} y="130" textAnchor="middle" fontSize="10.5" fontWeight="800" letterSpacing="1.5" fill={AMBER}>MEMORISED IT</text>
+      </motion.g>
+
+      {/* readouts */}
+      <rect x="0" y="248" width="640" height="32" rx="16" fill="#d9c8a6" />
+      <text x="20" y="268" fontSize="11" fontWeight="800" letterSpacing="2" fill={AMBER}>SEEN · THE GRADE</text>
+      <text x="620" y="268" textAnchor="end" fontSize="11" fontWeight="800" letterSpacing="2" fill={TEAL}>UNSEEN · WHAT WAS LEARNED</text>
+    </Figure>
+  );
+}
