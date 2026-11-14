@@ -58,7 +58,7 @@ export default function SiteFooter() {
       <div className="pointer-events-none absolute -right-24 bottom-0 h-72 w-72 rounded-full bg-assumption/30 blur-[100px]" />
       <div className="grid-dots pointer-events-none absolute inset-0 opacity-30" />
 
-      <div className="relative mx-auto max-w-6xl px-6 pb-8 pt-28">
+      <div className="relative mx-auto max-w-6xl px-6 pb-28 pt-28">
         <div className="grid gap-12 md:grid-cols-[1.4fr_repeat(3,1fr)]">
           <motion.div
             initial={{ opacity: 0, y: 24 }}
