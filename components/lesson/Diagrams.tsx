@@ -77,56 +77,298 @@ const draw = (delay = 0, duration = 1.2) => ({
 
 /* 1 — the seen and the unseen: iceberg / waterline */
 export function SeenUnseenDiagram() {
-  const cols = [
-    { x: 110, seen: "Tracks in a detector", hidden: "The particles", field: "Physics" },
-    { x: 320, seen: "Symptoms", hidden: "The disease", field: "Medicine" },
-    { x: 530, seen: "Prices, purchases, choices", hidden: "Motives inside people", field: "Economics" },
-  ];
-  return (
-    <Figure vb="0 0 640 330" caption="Every science works with what can be seen and the hidden things that produce it.">
-      <defs>
-        <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#fdf6e3" />
-          <stop offset="1" stopColor="#eaf4f7" />
-        </linearGradient>
-        <linearGradient id="deep" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#bcdce6" />
-          <stop offset="1" stopColor="#2b5a6b" />
-        </linearGradient>
-      </defs>
-      <rect x="0" y="0" width="640" height="150" fill="url(#sky)" rx="18" />
-      <rect x="0" y="150" width="640" height="180" fill="url(#deep)" rx="18" />
-      <rect x="0" y="130" width="640" height="40" fill="url(#sky)" opacity="0" />
-      <motion.path
-        d="M0 150 Q40 138 80 150 T160 150 T240 150 T320 150 T400 150 T480 150 T560 150 T640 150"
-        fill="none" stroke={TEAL} strokeWidth="3" strokeLinecap="round"
-        animate={{ d: [
-          "M0 150 Q40 138 80 150 T160 150 T240 150 T320 150 T400 150 T480 150 T560 150 T640 150",
-          "M0 150 Q40 162 80 150 T160 150 T240 150 T320 150 T400 150 T480 150 T560 150 T640 150",
-          "M0 150 Q40 138 80 150 T160 150 T240 150 T320 150 T400 150 T480 150 T560 150 T640 150",
-        ] }}
-        transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-      />
-      <text x="20" y="30" fontSize="13" fontWeight="700" letterSpacing="2" fill={AMBER}>SEEN · WHAT CAN BE OBSERVED</text>
-      <text x="20" y="318" fontSize="13" fontWeight="700" letterSpacing="2" fill="#dbeef4">UNSEEN · WHAT PRODUCES IT</text>
+  const T = 8;
+  const C = [110, 320, 530];
+  const hid = {
+    animate: { opacity: [0.28, 0.28, 1, 1, 0.28] },
+    transition: { duration: T, times: [0, 0.4, 0.56, 0.95, 1], repeat: Infinity, ease: "linear" as const },
+  };
+  const link = {
+    animate: { opacity: [0, 0, 1, 1, 0] },
+    transition: { duration: T, times: [0, 0.4, 0.56, 0.95, 1], repeat: Infinity, ease: "linear" as const },
+  };
+  const track = (a: number, b: number, c: number) => ({
+    animate: { pathLength: [0, 0, 1, 1, 0], opacity: [0, 0, 1, 1, 0] },
+    transition: { duration: T, times: [0, a, b, c, 1], repeat: Infinity, ease: "linear" as const },
+  });
+  const wave = (amp: number) => {
+    let d = "M0 150";
+    for (let i = 0; i < 16; i++) d += ` q20 ${i % 2 ? amp : -amp} 40 0`;
+    return d + " V400 H0 Z";
+  };
+  const virus = (x: number, y: number, r: number, k: number) => (
+    <g key={k} transform={`translate(${x} ${y})`}>
+      <animateTransform attributeName="transform" type="translate" additive="sum" values={`0 0;${k % 2 ? 6 : -6} -7;0 0`} dur={`${3.4 + k * 0.7}s`} repeatCount="indefinite" />
+      {Array.from({ length: 12 }).map((_, i) => {
+        const a = (i * 30 * Math.PI) / 180;
+        return (
+          <g key={i}>
+            <line x1={(r - 1) * Math.sin(a)} y1={-(r - 1) * Math.cos(a)} x2={(r + 5) * Math.sin(a)} y2={-(r + 5) * Math.cos(a)} stroke="#f2cc8f" strokeWidth="1.4" />
+            <circle cx={(r + 6) * Math.sin(a)} cy={-(r + 6) * Math.cos(a)} r="1.7" fill="#f2cc8f" />
+          </g>
+        );
+      })}
+      <circle r={r} fill="#e07a5f" />
+      <circle cx={-r / 3} cy={-r / 3} r={r / 3} fill="#fff" opacity="0.28" />
+      <circle r={r + 8} fill="#ff9d7a" opacity="0.2">
+        <animate attributeName="r" values={`${r + 4};${r + 12};${r + 4}`} dur="2.4s" begin={`${k * 0.5}s`} repeatCount="indefinite" />
+        <animate attributeName="opacity" values="0.3;0;0.3" dur="2.4s" begin={`${k * 0.5}s`} repeatCount="indefinite" />
+      </circle>
+    </g>
+  );
+  const tag = (x: number, price: string, up: boolean, k: number) => (
+    <g key={k} transform={`translate(${x} 52)`}>
+      <animateTransform attributeName="transform" type="rotate" additive="sum" values="-4 0 0;4 0 0;-4 0 0" dur={`${3 + k * 0.6}s`} begin={`${k * 0.4}s`} repeatCount="indefinite" />
+      <line x1="0" y1="0" x2="0" y2="8" stroke="#8a6a43" strokeWidth="1" />
+      <path d="M-15 12 L-8 8 H8 L15 12 V44 Q15 48 11 48 H-11 Q-15 48 -15 44 Z" fill="#fff8e6" stroke="#d8b46a" strokeWidth="1.2" />
+      <circle cx="0" cy="14" r="2" fill="#d8b46a" />
+      <text x="0" y="33" textAnchor="middle" fontSize="12" fontWeight="800" fill="#3a2a1a">{price}</text>
+      <path d={up ? "M-5 42 L0 37 L5 42" : "M-5 37 L0 42 L5 37"} stroke={up ? "#2e8b57" : "#c0392b"} strokeWidth="1.8" fill="none" strokeLinecap="round" strokeLinejoin="round">
+        <animate attributeName="opacity" values="1;0.2;1" dur="1.6s" begin={`${k * 0.3}s`} repeatCount="indefinite" />
+      </path>
+    </g>
+  );
 
-      {cols.map((c, i) => (
-        <g key={c.field}>
-          <motion.g {...pop(i)}>
-            <rect x={c.x - 90} y="68" width="180" height="50" rx="14" fill="#fff" stroke={AMBER_L} strokeWidth="2" />
-            <text x={c.x} y="98" textAnchor="middle" fontSize="14" fontWeight="600" fill={INK}>{c.seen}</text>
-          </motion.g>
-          <motion.line
-            x1={c.x} y1="226" x2={c.x} y2="124" stroke="#fff" strokeWidth="2" strokeDasharray="5 7" strokeLinecap="round"
-            animate={{ strokeDashoffset: [0, -24] }}
-            transition={{ duration: 1.4, repeat: Infinity, ease: "linear" }}
-          />
-          <motion.g {...pop(i + 3)}>
-            <rect x={c.x - 90} y="228" width="180" height="50" rx="14" fill={TEAL} stroke={TEAL_L} strokeWidth="2" />
-            <text x={c.x} y="258" textAnchor="middle" fontSize="14" fontWeight="600" fill="#fff">{c.hidden}</text>
-          </motion.g>
-          <text x={c.x} y="196" textAnchor="middle" fontSize="12" fontWeight="800" letterSpacing="2" fill="#fff">{c.field.toUpperCase()}</text>
+  return (
+    <Figure vb="0 0 640 360" caption="Every science works with what can be seen and the hidden things that produce it.">
+      <defs>
+        <linearGradient id="su-sky" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#2b5a6b" />
+          <stop offset="0.6" stopColor="#e8c79a" />
+          <stop offset="1" stopColor="#f8e3b8" />
+        </linearGradient>
+        <linearGradient id="su-water" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#5fa3ba" />
+          <stop offset="0.45" stopColor="#1f5a70" />
+          <stop offset="1" stopColor="#0c2a36" />
+        </linearGradient>
+        <linearGradient id="su-ice" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#ffffff" />
+          <stop offset="1" stopColor="#bfe0ec" />
+        </linearGradient>
+        <linearGradient id="su-mass" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#bfe6f2" stopOpacity="0.55" />
+          <stop offset="1" stopColor="#6fb4cb" stopOpacity="0.12" />
+        </linearGradient>
+        <radialGradient id="su-sun" cx="0.5" cy="0.5" r="0.5">
+          <stop offset="0" stopColor="#fff3c9" stopOpacity="0.95" />
+          <stop offset="1" stopColor="#fff3c9" stopOpacity="0" />
+        </radialGradient>
+        <radialGradient id="su-orb" cx="0.5" cy="0.5" r="0.5">
+          <stop offset="0" stopColor="#ffffff" />
+          <stop offset="0.35" stopColor="#8fe3ff" />
+          <stop offset="1" stopColor="#8fe3ff" stopOpacity="0" />
+        </radialGradient>
+        <filter id="su-blur" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="2.4" />
+        </filter>
+      </defs>
+
+      {/* sky, sun, clouds, gull */}
+      <rect x="0" y="0" width="640" height="152" rx="18" fill="url(#su-sky)" />
+      <circle cx="320" cy="150" r="120" fill="url(#su-sun)">
+        <animate attributeName="opacity" values="0.7;1;0.7" dur="6s" repeatCount="indefinite" />
+      </circle>
+      {[[40, 70, 0], [400, 52, 1]].map(([y, w, k]) => (
+        <g key={k}>
+          <ellipse cx="0" cy={Number(y) + 24} rx={w} ry="8" fill="#fff" opacity="0.25" />
+          <ellipse cx={Number(w) / 2} cy={Number(y) + 19} rx={Number(w) / 1.7} ry="7" fill="#fff" opacity="0.2" />
+          <animateTransform attributeName="transform" type="translate" values="-120 0;760 0" dur={`${46 + Number(k) * 14}s`} begin={`-${Number(k) * 20}s`} repeatCount="indefinite" />
         </g>
+      ))}
+      <g>
+        <path d="M0 0 q4 -5 8 0 q4 -5 8 0" stroke="#34464e" strokeWidth="1.3" fill="none" strokeLinecap="round">
+          <animate attributeName="d" values="M0 0 q4 -5 8 0 q4 -5 8 0;M0 0 q4 2 8 0 q4 2 8 0;M0 0 q4 -5 8 0 q4 -5 8 0" dur="0.9s" repeatCount="indefinite" />
+        </path>
+        <animateTransform attributeName="transform" type="translate" values="-30 130;680 112" dur="22s" repeatCount="indefinite" />
+      </g>
+
+      {/* water body with light shafts and bubbles */}
+      <rect x="0" y="150" width="640" height="210" fill="url(#su-water)" />
+      {[[80, 0], [250, 1.6], [430, 3.1]].map(([x, d]) => (
+        <polygon key={x} points={`${x},150 ${Number(x) + 40},150 ${Number(x) + 150},360 ${Number(x) + 40},360`} fill="#fff" opacity="0.07">
+          <animate attributeName="opacity" values="0.03;0.1;0.03" dur="6s" begin={`${d}s`} repeatCount="indefinite" />
+        </polygon>
+      ))}
+
+      {/* iceberg masses under the surface, and the tips above */}
+      {C.map((c, i) => (
+        <g key={i}>
+          <polygon points={`${c - 74},150 ${c - 100},202 ${c - 84},264 ${c - 42},316 ${c + 8},334 ${c + 58},304 ${c + 96},252 ${c + 88},198 ${c + 74},150`} fill="url(#su-mass)" stroke="#cfe9f2" strokeWidth="0.8" strokeOpacity="0.5" />
+          <polygon points={`${c - 74},150 ${c - 100},202 ${c - 60},210 ${c - 30},150`} fill="#fff" opacity="0.08" />
+          <polygon points={`${c - 72},150 ${c - 50},133 ${c - 24},140 ${c + 4},126 ${c + 30},137 ${c + 54},131 ${c + 74},150`} fill="url(#su-ice)" />
+          <polygon points={`${c + 4},126 ${c + 30},137 ${c + 10},150 ${c - 8},142`} fill="#9fcde0" opacity="0.7" />
+        </g>
+      ))}
+
+      {/* what we can see: three observation windows above the tips */}
+      {C.map((c, i) => (
+        <g key={i}>
+          <rect x={c - 69} y="48" width="138" height="86" rx="12" fill="#000" opacity="0.2" />
+          <rect x={c - 70} y="44" width="140" height="86" rx="12" fill={i === 0 ? "#0e1a22" : i === 1 ? "#f7f1e6" : "#fdf3df"} stroke="#fff" strokeWidth="2" />
+        </g>
+      ))}
+
+      {/* physics: tracks in a detector */}
+      <g>
+        {Array.from({ length: 9 }).map((_, k) => (
+          <line key={`v${k}`} x1={42 + k * 16} y1="48" x2={42 + k * 16} y2="126" stroke="#244456" strokeWidth="0.6" opacity="0.6" />
+        ))}
+        {Array.from({ length: 6 }).map((_, k) => (
+          <line key={`h${k}`} x1="42" y1={52 + k * 14} x2="178" y2={52 + k * 14} stroke="#244456" strokeWidth="0.6" opacity="0.6" />
+        ))}
+        {[
+          ["M52 122 Q84 104 92 62", 0.05, 0.22, 0.82],
+          ["M176 120 Q150 98 132 74 Q124 64 114 58", 0.14, 0.3, 0.86],
+          ["M58 60 Q100 70 118 108 Q122 118 134 124", 0.22, 0.38, 0.9],
+        ].map(([d, a, b, c2], k) => (
+          <g key={k}>
+            <motion.path d={d as string} fill="none" stroke="#8fe3ff" strokeWidth="4" strokeLinecap="round" filter="url(#su-blur)" {...track(a as number, b as number, c2 as number)} />
+            <motion.path d={d as string} fill="none" stroke="#e8fbff" strokeWidth="1.6" strokeLinecap="round" {...track(a as number, b as number, c2 as number)} />
+          </g>
+        ))}
+        <circle cx="110" cy="124" r="2" fill="#8fe3ff" opacity="0.6" />
+      </g>
+
+      {/* medicine: temperature and pulse */}
+      <g>
+        <rect x="294" y="56" width="9" height="58" rx="4.5" fill="#fff" stroke="#cfd6da" strokeWidth="1.2" />
+        <circle cx="298.5" cy="119" r="8" fill="#c0392b" />
+        <rect x="296.5" y="64" width="4" height="55" fill="#c0392b">
+          <animate attributeName="y" values="98;66;98" dur="5s" repeatCount="indefinite" />
+          <animate attributeName="height" values="21;53;21" dur="5s" repeatCount="indefinite" />
+        </rect>
+        {[0, 1, 2, 3].map((k) => (
+          <line key={k} x1="303" y1={64 + k * 12} x2="307" y2={64 + k * 12} stroke="#9aa4a8" strokeWidth="0.8" />
+        ))}
+        <text x="336" y="70" fontSize="14" fontWeight="800" fill="#c0392b">39.2°C</text>
+        <path d="M322 100 H334 L338 88 L343 112 L348 82 L353 106 L357 98 H386" fill="none" stroke="#c0392b" strokeWidth="1.8" strokeLinejoin="round" strokeLinecap="round" strokeDasharray="60 12">
+          <animate attributeName="stroke-dashoffset" values="0;-72" dur="1.4s" repeatCount="indefinite" />
+        </path>
+        <circle cx="386" cy="98" r="2.4" fill="#c0392b">
+          <animate attributeName="opacity" values="1;0.2;1" dur="0.7s" repeatCount="indefinite" />
+        </circle>
+      </g>
+
+      {/* economics: the prices people see */}
+      <g>
+        <line x1="466" y1="52" x2="594" y2="52" stroke="#8a6a43" strokeWidth="2" strokeLinecap="round" />
+        {tag(490, "120", true, 0)}
+        {tag(530, "95", false, 1)}
+        {tag(570, "140", true, 2)}
+        {[0, 1, 2].map((k) => (
+          <ellipse key={k} cx="492" cy={124 - k * 3.6} rx="9" ry="3" fill="#e0a548" stroke="#a8701c" strokeWidth="0.8" />
+        ))}
+      </g>
+
+      {/* waterline legend and field names */}
+      {C.map((c, i) => (
+        <g key={i}>
+          <rect x={c - 52} y="143" width="104" height="20" rx="10" fill="#0f2a33" opacity="0.72" />
+          <text x={c} y="157" textAnchor="middle" fontSize="11" fontWeight="800" letterSpacing="2" fill="#fff">{["PHYSICS", "MEDICINE", "ECONOMICS"][i]}</text>
+        </g>
+      ))}
+
+      {/* the unseen: stages under the surface */}
+      {C.map((c, i) => (
+        <motion.g key={i} {...hid}>
+          <rect x={c - 62} y="186" width="124" height="106" rx="14" fill="#0b2a36" opacity="0.55" stroke="#8fd0e6" strokeWidth="1" strokeOpacity="0.5" />
+        </motion.g>
+      ))}
+
+      {/* hidden physics: the particle */}
+      <motion.g {...hid}>
+        <circle cx="110" cy="240" r="26" fill="url(#su-orb)">
+          <animate attributeName="r" values="20;30;20" dur="2.4s" repeatCount="indefinite" />
+        </circle>
+        <circle cx="110" cy="240" r="5" fill="#fff" />
+        <ellipse cx="110" cy="240" rx="42" ry="16" fill="none" stroke="#8fe3ff" strokeWidth="1" strokeDasharray="3 5" opacity="0.8">
+          <animateTransform attributeName="transform" type="rotate" values="0 110 240;360 110 240" dur="9s" repeatCount="indefinite" />
+        </ellipse>
+        <ellipse cx="110" cy="240" rx="42" ry="16" fill="none" stroke="#8fe3ff" strokeWidth="1" strokeDasharray="3 5" opacity="0.6" transform="rotate(60 110 240)">
+          <animateTransform attributeName="transform" type="rotate" values="60 110 240;420 110 240" dur="7s" repeatCount="indefinite" />
+        </ellipse>
+        <g>
+          <circle cx="152" cy="240" r="2.6" fill="#fff" />
+          <animateTransform attributeName="transform" type="rotate" values="0 110 240;360 110 240" dur="3.2s" repeatCount="indefinite" />
+        </g>
+        <g>
+          <circle cx="76" cy="240" r="2.2" fill="#f3c87a" />
+          <animateTransform attributeName="transform" type="rotate" values="0 110 240;-360 110 240" dur="4.6s" repeatCount="indefinite" />
+        </g>
+      </motion.g>
+
+      {/* hidden medicine: the virus */}
+      <motion.g {...hid}>
+        {virus(300, 232, 9, 0)}
+        {virus(342, 256, 7, 1)}
+        {virus(322, 214, 6, 2)}
+        {virus(296, 268, 5, 3)}
+      </motion.g>
+
+      {/* hidden economics: motives inside people */}
+      <motion.g {...hid}>
+        {[[498, 224, "heart"], [538, 250, "clock"], [512, 274, "coin"]].map(([x, y, kind], k) => (
+          <g key={k} transform={`translate(${x} ${y})`}>
+            <animateTransform attributeName="transform" type="translate" additive="sum" values="0 0;0 -6;0 0" dur={`${2.8 + k * 0.6}s`} begin={`${k * 0.5}s`} repeatCount="indefinite" />
+            <ellipse cx="0" cy="0" rx="19" ry="14" fill="#2b5a6b" stroke="#7fc0d3" strokeWidth="1.4" strokeDasharray="4 3" />
+            {kind === "heart" && <path d="M0 -3 C-3 -8 -10 -4 0 6 C10 -4 3 -8 0 -3 Z" fill="#ff6b6b" />}
+            {kind === "clock" && (
+              <g>
+                <circle r="7" fill="none" stroke="#f3c87a" strokeWidth="1.6" />
+                <path d="M0 -4 V0 L3 2" stroke="#f3c87a" strokeWidth="1.4" fill="none" strokeLinecap="round" />
+              </g>
+            )}
+            {kind === "coin" && (
+              <g>
+                <circle r="7" fill="#e0a548" stroke="#a8701c" strokeWidth="1" />
+                <text y="3.4" textAnchor="middle" fontSize="9" fontWeight="800" fill="#6a430f">$</text>
+              </g>
+            )}
+          </g>
+        ))}
+      </motion.g>
+
+      {/* hidden thing labels */}
+      <motion.g {...hid}>
+        <text x="110" y="326" textAnchor="middle" fontSize="11" fontWeight="800" letterSpacing="1.6" fill="#dbeef4">THE PARTICLES</text>
+        <text x="320" y="326" textAnchor="middle" fontSize="11" fontWeight="800" letterSpacing="1.6" fill="#dbeef4">THE DISEASE</text>
+        <text x="530" y="326" textAnchor="middle" fontSize="11" fontWeight="800" letterSpacing="1.6" fill="#dbeef4">MOTIVES INSIDE PEOPLE</text>
+      </motion.g>
+
+      {/* links from the visible trace down to what produces it */}
+      {C.map((c, i) => (
+        <motion.line key={i} x1={c} y1="164" x2={c} y2="186" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeDasharray="3 6" {...link}>
+          <animate attributeName="stroke-dashoffset" values="0;-18" dur="0.9s" repeatCount="indefinite" />
+        </motion.line>
+      ))}
+
+      {/* waves on the surface and bubbles */}
+      <g opacity="0.55">
+        <path d={wave(5)} fill="#fff" opacity="0.1" />
+        <animateTransform attributeName="transform" type="translate" values="-80 0;0 0" dur="7s" repeatCount="indefinite" />
+      </g>
+      <g opacity="0.5">
+        <path d={wave(4)} fill="#bfe6f2" opacity="0.14" transform="translate(0 2)" />
+        <animateTransform attributeName="transform" type="translate" values="0 0;-80 0" dur="9s" repeatCount="indefinite" />
+      </g>
+      <path d="M0 150 H640" stroke="#fff" strokeWidth="1" opacity="0.5" />
+      {[[40, 0], [180, 1.7], [260, 0.8], [400, 2.6], [470, 1.1], [600, 3.4]].map(([x, d]) => (
+        <circle key={`${x}`} cx={x} cy="330" r="2" fill="#fff" opacity="0">
+          <animate attributeName="cy" values="340;170" dur="7s" begin={`${d}s`} repeatCount="indefinite" />
+          <animate attributeName="opacity" values="0;0.5;0" dur="7s" begin={`${d}s`} repeatCount="indefinite" />
+        </circle>
+      ))}
+
+      {/* step labels */}
+      {[
+        { x: 160, label: "1 · WHAT WE CAN SEE", t: [0, 0.05, 0.38, 0.44] },
+        { x: 480, label: "2 · WHAT PRODUCES IT", t: [0.4, 0.5, 0.95, 1] },
+      ].map((s) => (
+        <motion.g key={s.label} animate={{ opacity: [0.3, 1, 1, 0.3] }} transition={{ duration: T, times: s.t, repeat: Infinity }}>
+          <rect x={s.x - 98} y="10" width="196" height="22" rx="11" fill="#0f2a33" opacity="0.6" />
+          <text x={s.x} y="25" textAnchor="middle" fontSize="10.5" fontWeight="800" letterSpacing="1.5" fill="#fff">{s.label}</text>
+        </motion.g>
       ))}
     </Figure>
   );
