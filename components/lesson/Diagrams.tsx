@@ -255,3 +255,69 @@ export function ThreeTestsDiagram() {
     </Figure>
   );
 }
+
+/* 0 — at the crossing: the car you see, the intention you cannot */
+export function CrossingDiagram() {
+  const T = 8;
+  const carTimes = [0, 0.5, 1];
+  return (
+    <Figure vb="0 0 640 270" caption="You can see the car slowing. The driver's intention to stop is what you actually act on, and it is invisible.">
+      <rect x="0" y="0" width="640" height="112" rx="18" fill="#eaf4f7" />
+      <rect x="0" y="112" width="640" height="20" fill="#d9d2c3" />
+      <rect x="0" y="132" width="640" height="100" fill="#4a4741" />
+      <rect x="0" y="232" width="640" height="38" rx="18" fill="#d9d2c3" />
+      {[0, 1, 2, 3, 4, 5, 6, 7].map((i) => (
+        <rect key={i} x={20 + i * 85} y="180" width="42" height="5" rx="2" fill="#f4efe4" opacity="0.7" />
+      ))}
+      {[0, 1, 2, 3, 4].map((i) => (
+        <rect key={i} x="440" y={136 + i * 19} width="70" height="11" fill="#f4efe4" opacity="0.85" />
+      ))}
+      <text x="475" y="105" textAnchor="middle" fontSize="11" fontWeight="800" letterSpacing="2" fill={MUTED}>CROSSING</text>
+
+      {/* pedestrian steps off the kerb */}
+      <motion.g
+        animate={{ y: [0, 0, 36, 36, 0], opacity: [1, 1, 1, 1, 0] }}
+        transition={{ duration: T, times: [0, 0.55, 0.68, 0.95, 1], repeat: Infinity, ease: "easeInOut" }}
+      >
+        <circle cx="475" cy="78" r="8" fill={INK} />
+        <line x1="475" y1="86" x2="475" y2="108" stroke={INK} strokeWidth="5" strokeLinecap="round" />
+        <line x1="475" y1="108" x2="469" y2="124" stroke={INK} strokeWidth="4" strokeLinecap="round" />
+        <line x1="475" y1="108" x2="481" y2="124" stroke={INK} strokeWidth="4" strokeLinecap="round" />
+      </motion.g>
+
+      {/* the car decelerates to a stop before the crossing */}
+      <motion.g
+        initial={{ x: -170 }}
+        animate={{ x: [-170, 190, 190] }}
+        transition={{ duration: T, times: carTimes, repeat: Infinity, ease: ["easeOut", "linear"] }}
+      >
+        <rect x="40" y="152" width="120" height="38" rx="12" fill={AMBER} />
+        <path d="M62 152 L78 130 H128 L144 152 Z" fill={AMBER_L} />
+        <rect x="84" y="136" width="18" height="14" rx="3" fill="#eaf4f7" />
+        <rect x="108" y="136" width="18" height="14" rx="3" fill="#eaf4f7" />
+        <circle cx="68" cy="192" r="11" fill={INK} />
+        <circle cx="132" cy="192" r="11" fill={INK} />
+        {/* the hidden thing: an intention inside the driver */}
+        <motion.g
+          animate={{ opacity: [0, 0, 1, 1, 0] }}
+          transition={{ duration: T, times: [0, 0.3, 0.45, 0.95, 1], repeat: Infinity }}
+        >
+          <ellipse cx="100" cy="98" rx="66" ry="22" fill="#2b5a6b" stroke={TEAL_L} strokeWidth="2" strokeDasharray="5 5" />
+          <circle cx="96" cy="124" r="4" fill={TEAL} />
+          <circle cx="92" cy="114" r="6" fill={TEAL} />
+          <text x="100" y="103" textAnchor="middle" fontSize="13" fontWeight="600" fill="#fff">“I'll stop”</text>
+        </motion.g>
+      </motion.g>
+
+      {/* what you can see: a falling speed */}
+      <text x="20" y="254" fontSize="11" fontWeight="800" letterSpacing="2" fill={AMBER}>SEEN · SPEED</text>
+      <rect x="130" y="245" width="140" height="10" rx="5" fill="#fff" opacity="0.6" />
+      <motion.rect
+        x="130" y="245" height="10" rx="5" fill={AMBER}
+        animate={{ width: [140, 6, 6] }}
+        transition={{ duration: T, times: carTimes, repeat: Infinity, ease: ["easeOut", "linear"] }}
+      />
+      <text x="620" y="254" textAnchor="end" fontSize="11" fontWeight="800" letterSpacing="2" fill={TEAL}>UNSEEN · THE DRIVER'S INTENTION</text>
+    </Figure>
+  );
+}
