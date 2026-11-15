@@ -10,7 +10,7 @@ const allowed = (process.env.ALLOWED_EMAILS || DEFAULT_ALLOWED)
   .filter(Boolean);
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
-  providers: [Google],
+  providers: [Google({ authorization: { params: { prompt: "select_account" } } })],
   trustHost: true,
   session: { strategy: "jwt", maxAge: 60 * 60 * 24 },
   callbacks: {
