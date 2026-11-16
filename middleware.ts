@@ -10,5 +10,8 @@ export default auth((req) => {
 });
 
 export const config = {
-  matcher: ["/((?!api/auth|_next/static|_next/image|favicon.ico).*)"],
+  // Public (no sign-in): auth endpoints, static assets, and the L1 lesson.
+  matcher: [
+    "/((?!api/auth|_next/static|_next/image|favicon.ico|course/l1-models-and-methodology).*)",
+  ],
 };
