@@ -4,7 +4,7 @@ This file is the working specification for Claude Code. Read it fully before gen
 
 ## How to start (read this when returning after a few days)
 
-- **Open:** `D:bm-micro` — in a terminal run `cd D:bm-micro` then `claude`.
+- **Open:** `D:\abm-micro` — in a terminal run `cd D:\abm-micro` then `claude`.
 - **Run locally:** `npm install` (once; already done), then `npm run dev` → http://localhost:3000. `npm run build` to check a production build.
 - **Live site:** https://abm-micro.vercel.app/ (auto-deploys from GitHub `zulfiqaralimir/abm-micro`, branch `main`).
 - **Announcements page:** https://abm-micro.vercel.app/announcements (content in `content/announcements`).
